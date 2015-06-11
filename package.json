@@ -1,0 +1,17 @@
+{
+  "name": "misc",
+  "version": "0.0.0",
+  "description": "misc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QiV/misc"
+  },
+  "keywords": [],
+  "author": "killxxxvi@mail.ru",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/QiV/misc/issues"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
