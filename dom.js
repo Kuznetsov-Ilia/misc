@@ -3,10 +3,10 @@
 var D = document;
 var W = window;
 var Np = Node.prototype;
-/*var NLp = NodeList.prototype;
+var NLp = NodeList.prototype;
 var HCp = HTMLCollection.prototype;
 var Ap = Array.prototype;
-var Ep = Element.prototype;*/
+//var Ep = Element.prototype;
 import {
   isNode, isArray, isObject, isset, keys, extend
 }
@@ -142,6 +142,16 @@ Np.off = D.off = off;
 Np.trigger = D.trigger = trigger;
 Np.handlers = {};
 D.handlers = {};
+
+[
+  //ES3
+  'join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf',
+  'some', 'every', 'filter', 'map', 'reduce', 'reduceRight'
+  //ES5
+].forEach(function (method) {
+  NLp[method] = HCp[method] = Ap[method];
+});
+
 
 /*
 NLp.on = HCp.on = Ap.on = function (name, callback, context) {

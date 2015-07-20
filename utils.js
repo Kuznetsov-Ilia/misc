@@ -61,7 +61,7 @@ export function isUndefined(value) {
   return typeof value === 'undefined';
 }
 export function isset(value) {
-  return typeof value !== 'undefined';
+  return value !== undefined;
 }
 export function is(value) {
   return isset(value) && !!value;
@@ -69,6 +69,10 @@ export function is(value) {
 export function isEqual(input1, input2) {
   return input1 === input2 || JSON.stringify(input1) === JSON.stringify(input2);
 }
+export function isFragment(node) {
+  return isset(node) && node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
+}
+
 export var now = Date.now ? Date.now : function () {
   return Number(new Date());
 };

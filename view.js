@@ -84,7 +84,10 @@ export default class View extends Events {
       data = model || {};
     }*/
 
-    this.template.render(this.state || {}, root);
+    this.template.render(root);
+    if (this.didRender !== noop) {
+      this.didRender(root);
+    }
     /*if (this.preloaderTimer !== noop) {
       this.preloaderTimer();
     }
