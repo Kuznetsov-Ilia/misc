@@ -4,17 +4,14 @@
 * @license MIT
 */
 
-'use strict';
-
-exports.__esModule = true;
-exports['default'] = Promise;
+export default Promise;
 
 function noop() {}
 
+
 function _then(promise, method, callback) {
   return function () {
-    var args = arguments,
-        retVal;
+    var args = arguments, retVal;
 
     /* istanbul ignore else */
     if (typeof callback === 'function') {
@@ -31,7 +28,8 @@ function _then(promise, method, callback) {
       if (retVal && typeof retVal.then === 'function') {
         if (retVal.done && retVal.fail) {
           retVal.done(promise.resolve).fail(promise.reject);
-        } else {
+        }
+        else {
           retVal.then(promise.resolve, promise.reject);
         }
         return;
@@ -44,6 +42,7 @@ function _then(promise, method, callback) {
     promise[method].apply(promise, args);
   };
 };
+
 
 /**
  * «Обещания» поддерживают как [нативный](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -59,13 +58,13 @@ function Promise(executor) {
   var _args;
   var _doneFn = [];
   var _failFn = [];
-  var dfd = /** @lends Promise.prototype */{
+  var dfd = /** @lends Promise.prototype */ {
     /**
      * Добавляет обработчик, который будет вызван, когда «обещание» будет «разрешено»
      * @param  {Function}  fn  функция обработчик
      * @returns {Promise}
      */
-    done: function done(fn) {
+    done: function (fn) {
       _doneFn.push(fn);
       return dfd;
     },
@@ -75,7 +74,7 @@ function Promise(executor) {
      * @param  {Function}  fn  функция обработчик
      * @returns {Promise}
      */
-    fail: function fail(fn) {
+    fail: function (fn) {
       _failFn.push(fn);
       return dfd;
     },
@@ -86,29 +85,34 @@ function Promise(executor) {
      * @param   {Function}   [failFn]   или когда «обещание» будет «отменено»
      * @returns {Promise}
      */
-    then: function then(doneFn, failFn) {
+    then: function (doneFn, failFn) {
       var promise = Promise();
 
-      dfd.done(_then(promise, 'resolve', doneFn)).fail(_then(promise, 'reject', failFn));
+      dfd
+        .done(_then(promise, 'resolve', doneFn))
+        .fail(_then(promise, 'reject', failFn))
+      ;
 
       return promise;
     },
 
     notify: noop, // jQuery support
     progress: noop, // jQuery support
-    promise: function promise() {
+    promise: function () {
       // jQuery support
       return dfd;
     },
+
 
     /**
      * Добавить обработчик «обещаний» в независимости от выполнения
      * @param   {Function}   fn   функция обработчик
      * @returns {Promise}
      */
-    always: function always(fn) {
+    always: function (fn) {
       return dfd.done(fn).fail(fn);
     },
+
 
     /**
      * «Разрешить» «обещание»
@@ -117,6 +121,7 @@ function Promise(executor) {
      * @returns  {Promise}
      */
     resolve: _setState(true),
+
 
     /**
      * «Отменить» «обещание»
@@ -127,6 +132,7 @@ function Promise(executor) {
     reject: _setState(false)
   };
 
+
   /**
    * @name  Promise#catch
    * @alias fail
@@ -135,6 +141,7 @@ function Promise(executor) {
   dfd['catch'] = function (fn) {
     return dfd.then(null, fn);
   };
+
 
   // Работеам как native Promises
   /* istanbul ignore else */
@@ -162,7 +169,10 @@ function Promise(executor) {
       _completed = true;
 
       // Затираем методы
-      dfd.done = dfd.fail = dfd.resolve = dfd.reject = function () {
+      dfd.done =
+      dfd.fail =
+      dfd.resolve =
+      dfd.reject = function () {
         return dfd;
       };
 
@@ -175,9 +185,10 @@ function Promise(executor) {
       };
 
       var fn,
-          fns = state ? _doneFn : _failFn,
-          i = 0,
-          n = fns.length;
+        fns = state ? _doneFn : _failFn,
+        i = 0,
+        n = fns.length
+      ;
 
       for (; i < n; i++) {
         fn = fns[i];
@@ -204,27 +215,29 @@ function Promise(executor) {
 
 Promise.all = function (iterable) {
   var dfd = Promise(),
-      d,
-      i = 0,
-      n = iterable.length,
-      remain = n,
-      values = [],
-      _fn,
-      _doneFn = function _doneFn(i, val) {
-    i >= 0 && (values[i] = val);
+    d,
+    i = 0,
+    n = iterable.length,
+    remain = n,
+    values = [],
+    _fn,
+    _doneFn = function (i, val) {
+      (i >= 0) && (values[i] = val);
 
-    /* istanbul ignore else */
-    if (--remain <= 0) {
-      dfd.resolve(values);
+      /* istanbul ignore else */
+      if (--remain <= 0) {
+        dfd.resolve(values);
+      }
+    },
+    _failFn = function (err) {
+      dfd.reject([err]);
     }
-  },
-      _failFn = function _failFn(err) {
-    dfd.reject([err]);
-  };
+  ;
 
   if (remain === 0) {
     _doneFn();
-  } else {
+  }
+  else {
     for (; i < n; i++) {
       d = iterable[i];
 
@@ -235,7 +248,8 @@ Promise.all = function (iterable) {
         } else {
           d.then(_fn, _failFn);
         }
-      } else {
+      }
+      else {
         _doneFn(i, d);
       }
     }
@@ -243,6 +257,7 @@ Promise.all = function (iterable) {
 
   return dfd;
 };
+
 
 /**
  * Дождаться «разрешения» всех обещаний и вернуть результат последнего
@@ -257,6 +272,7 @@ Promise.race = function (iterable) {
   });
 };
 
+
 /**
  * Привести значение к «Обещанию»
  * @static
@@ -266,10 +282,12 @@ Promise.race = function (iterable) {
  */
 Promise.cast = function (value) {
   var promise = Promise().resolve(value);
-  return value && typeof value.then === 'function' ? promise.then(function () {
-    return value;
-  }) : promise;
+  return value && typeof value.then === 'function'
+    ? promise.then(function () { return value; })
+    : promise
+  ;
 };
+
 
 /**
  * Вернуть «разрешенное» обещание
@@ -282,6 +300,7 @@ Promise.resolve = function (value) {
   return Promise().resolve(value);
 };
 
+
 /**
  * Вернуть «отклоненное» обещание
  * @static
@@ -293,16 +312,14 @@ Promise.reject = function (value) {
   return Promise().reject(value);
 };
 
+
 /**
  * Дождаться «разрешения» всех обещаний
  * @param   {Object}  map «Ключь» => «Обещание»
  * @returns {Promise}
  */
 Promise.map = function (map) {
-  var array = [],
-      key,
-      idx = 0,
-      results = {};
+  var array = [], key, idx = 0, results = {};
 
   for (key in map) {
     array.push(map[key]);
@@ -317,4 +334,3 @@ Promise.map = function (map) {
     return results;
   });
 };
-module.exports = exports['default'];

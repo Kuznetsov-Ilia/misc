@@ -1,26 +1,17 @@
-'use strict';
-
-exports.__esModule = true;
-exports.on = on;
-exports.off = off;
-exports.trigger = trigger;
-
-//var Ep = Element.prototype;
-
-var _utils = require('./utils');
-
 var D = document;
 var W = window;
 var Np = Node.prototype;
 var NLp = NodeList.prototype;
 var HCp = HTMLCollection.prototype;
 var Ap = Array.prototype;
+//var Ep = Element.prototype;
+import { isNode, isArray, isObject, isset, keys } from './utils';
 
 W.on = D.on = Np.on = on;
 W.off = D.off = Np.off = off;
 W.trigger = Np.trigger = D.trigger = trigger;
 W.find = Np.find = D.find = find;
-W.filter = Np.filter = D.filter = /*W.$ = Np.$ = D.$ =*/filter;
+W.filter = Np.filter = D.filter = /*W.$ = Np.$ = D.$ =*/ filter;
 W.handlers = {};
 D.handlers = {};
 Np.handlers = {};
@@ -34,31 +25,33 @@ Object.defineProperties(W, singleProps);
 Object.defineProperties(D, singleProps);
 Object.defineProperties(Np, singleProps);*/
 
-var ES5ArrayMethods = ['join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf', //ES3
-'some', 'every', /*'find', 'filter',*/'map', 'reduce', 'reduceRight' //ES5
-].reduce(function (acc, value) {
-  acc[value] = { value: Ap[value] };
+var ES5ArrayMethods = [
+  'join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf',//ES3
+  'some', 'every', /*'find', 'filter',*/ 'map', 'reduce', 'reduceRight'//ES5
+].reduce((acc, value) => {
+  acc[value] = {value: Ap[value]};
   return acc;
 }, {});
 
 var CustomMethods = {
-  // on : onAll,
+ // on : onAll,
   off: offAll,
   find: findAll,
   filter: filterAll,
   trigger: triggerAll,
   matches: matchesAll
 };
-var props = Object.keys(CustomMethods).reduce(function (acc, value) {
-  acc[value] = { value: CustomMethods[value] };
+var props = Object.keys(CustomMethods).reduce((acc, value) => {
+  acc[value] = {value: CustomMethods[value]};
   return acc;
 }, ES5ArrayMethods);
 
 Object.defineProperties(NLp, props);
 Object.defineProperties(HCp, props);
 
-function on(el, name, callback, context) {
-  if (_utils.isNode(this)) {
+
+export function on(el, name, callback, context) {
+  if (isNode(this)) {
     context = callback;
     callback = name;
     name = el;
@@ -67,11 +60,11 @@ function on(el, name, callback, context) {
   if (!el) {
     return false;
   }
-  if (_utils.isArray(name)) {
+  if (isArray(name)) {
     name.forEach(function (n) {
       on(el, n, callback, context);
     });
-  } else if (_utils.isObject(name)) {
+  } else if (isObject(name)) {
     context = callback;
     for (var i in name) {
       on(el, i, name[i], context);
@@ -94,9 +87,8 @@ function on(el, name, callback, context) {
   }
   return el;
 }
-
-function off(el, event, fn) {
-  if (_utils.isNode(this)) {
+export function off(el, event, fn) {
+  if (isNode(this)) {
     fn = event;
     event = el;
     el = this;
@@ -105,18 +97,18 @@ function off(el, event, fn) {
     return false;
   }
 
-  if (_utils.isset(this.handlers) || !_utils.keys(this.handlers).length) {
+  if (isset(this.handlers) || !keys(this.handlers).length) {
     return this;
-  } else if (_utils.isset(fn)) {
-    if (_utils.isArray(event)) {
+  } else if (isset(fn)) {
+    if (isArray(event)) {
       event.forEach(function (e) {
         el.removeEventListener(e, fn, false);
       });
     } else {
       this.removeEventListener(event, fn, false);
     }
-  } else if (_utils.isset(event)) {
-    if (_utils.isArray(event)) {
+  } else if (isset(event)) {
+    if (isArray(event)) {
       event.forEach(function (e) {
         el.handlers[e].forEach(function (handler, i) {
           el.removeEventListener(e, handler, false);
@@ -130,7 +122,7 @@ function off(el, event, fn) {
       });
     }
   } else {
-    _utils.keys(this.handlers).forEach(function (e) {
+    keys(this.handlers).forEach(function (e) {
       el.handlers[e].forEach(function (handler, i) {
         el.removeEventListener(e, handler, false);
         delete el.handlers[i];
@@ -145,18 +137,18 @@ function find(selector) {
     return Ap.find
   }*/
   switch (selector.charAt(0)) {
-    case '#':
-      return D.getElementById(selector.substr(1));
-    case '.':
-      return this.getElementsByClassName(selector.substr(1))[0];
-    case /w+/gi:
-      return this.getElementsByTagName(selector);
-    default:
-      return this.querySelector(selector || '☺');
+  case '#':
+    return D.getElementById(selector.substr(1));
+  case '.':
+    return this.getElementsByClassName(selector.substr(1))[0];
+  case /w+/gi:
+    return this.getElementsByTagName(selector);
+  default:
+    return this.querySelector(selector || '☺');
   }
 }
 
-function filter(selector) {
+function filter (selector) {
   return this.querySelectorAll(selector || '☺');
 }
 
@@ -170,7 +162,8 @@ function delegate(selector, handler) {
         target: target,
         realTarget: event.target
       };
-      ['initMouseEvent', 'initUIEvent', 'initEvent', 'preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(function (e) {
+      ['initMouseEvent', 'initUIEvent', 'initEvent', 'preventDefault', 'stopImmediatePropagation', 'stopPropagation']
+      .forEach(e => {
         if (e in event) {
           pseudoEvent[e] = event[e].bind(event);
         }
@@ -180,8 +173,8 @@ function delegate(selector, handler) {
   };
 }
 
-function trigger(el, type, data) {
-  if (_utils.isNode(this)) {
+export function trigger(el, type, data) {
+  if (isNode(this)) {
     data = type;
     type = el;
     el = this;
@@ -197,29 +190,23 @@ function trigger(el, type, data) {
   return this;
 }
 
-function onAll(name, callback, context) {
-  this.forEach(function (node) {
-    on(node, name, callback, context);
-  });
+function onAll (name, callback, context) {
+  this.forEach(node => {on(node, name, callback, context)});
   return this;
 }
-function offAll(event, fn) {
-  this.forEach(function (node) {
-    off(node, event, fn);
-  });
+function offAll (event, fn) {
+  this.forEach(node => {off(node, event, fn)});
   return this;
 }
-function triggerAll(type, data) {
-  this.forEach(function (node) {
-    trigger(node, type, data);
-  });
+function triggerAll (type, data) {
+  this.forEach(node => {trigger(node, type, data)});
   return this;
 }
 function findAll(selector) {
   if (typeof selector === 'function') {
     return Ap.find.call(this, selector);
   }
-  this.forEach(function (node) {
+  this.forEach(node => {
     var found = node.find(selector);
     if (found) {
       return found;
@@ -233,7 +220,7 @@ function filterAll(selector) {
   }
   var result = [];
   var r;
-  this.forEach(function (node) {
+  this.forEach(node => {
     r = node.filter(selector);
     if (r) {
       result.push(r);
@@ -241,8 +228,6 @@ function filterAll(selector) {
   });
   return result.length ? result : null;
 }
-function matchesAll(selector) {
-  return this.every(function (node) {
-    return node.matches(selector);
-  });
+function matchesAll (selector) {
+  return this.every(node => node.matches(selector));
 }

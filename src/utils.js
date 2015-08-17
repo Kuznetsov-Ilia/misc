@@ -1,72 +1,11 @@
 // inherit.js https://gist.github.com/RubaXa/8857525
 
-'use strict';
-
-exports.__esModule = true;
-exports.extend = extend;
-exports.isObject = isObject;
-exports.isFunction = isFunction;
-exports.contains = contains;
-exports.isRegExp = isRegExp;
-exports.isFunction = isFunction;
-exports.isNode = isNode;
-exports.isObject = isObject;
-exports.isArray = isArray;
-exports.isString = isString;
-exports.isNumber = isNumber;
-exports.isUndefined = isUndefined;
-exports.isset = isset;
-exports.is = is;
-exports.isEqual = isEqual;
-exports.isFragment = isFragment;
-exports.rand = rand;
-exports.result = result;
-exports.inherits = inherits;
-exports.pick = pick;
-exports.noop = noop;
-exports.clone = clone;
-exports.keys = keys;
-exports.outerHeight = outerHeight;
-exports.outerWidth = outerWidth;
-exports.offset = offset;
-exports.height = height;
-exports.width = width;
-exports.position = position;
-exports.parent = parent;
-exports.parentAll = parentAll;
-exports.siblings = siblings;
-exports.prev = prev;
-exports.prevAll = prevAll;
-exports.next = next;
-exports.nextAll = nextAll;
-exports.first = first;
-exports.after = after;
-exports.before = before;
-exports.append = append;
-exports.prepend = prepend;
-exports.replaceWith = replaceWith;
-exports.css = css;
-exports.data = data;
-exports.attr = attr;
-exports.text = text;
-exports.html = html;
-exports.throttle = throttle;
-exports.debounce = debounce;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _globalWindow = require('global/window');
-
-var _globalWindow2 = _interopRequireDefault(_globalWindow);
-
-var _globalHtml = require('global/html');
-
-var _globalHtml2 = _interopRequireDefault(_globalHtml);
-
+import WINDOW from 'global/window';
+import HTML from 'global/html';
 var CACHE = {};
 var CACHE_KEY = 0;
 
-function extend(original, extended) {
+export function extend(original, extended) {
   if (arguments.length > 2) {
     for (var i = 1, l = arguments.length; i < l; i++) {
       extend(original, arguments[i]);
@@ -80,32 +19,26 @@ function extend(original, extended) {
   }
   return original;
 }
-
-function isObject(value) {
+export function isObject(value) {
   return typeof value === 'object';
 }
-
-function isFunction(value) {
+export function isFunction(value) {
   return typeof value === 'function';
 }
-
-function contains(where, value) {
+export function contains(where, value) {
   if (isArray(this) || isString(this)) {
     value = where;
     where = this;
   }
   return where.indexOf(value) !== -1;
 }
-
-function isRegExp(value) {
+export function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
-
-function isFunction(value) {
+export function isFunction(value) {
   return isset(value) && value instanceof Function;
 }
-
-function isNode(value) {
+export function isNode(value) {
   return isset(value) && value instanceof Node;
 
   /*return !!(object && (
@@ -114,60 +47,47 @@ function isNode(value) {
     typeof object.nodeName === 'string'))
   ));*/
 }
-
-function isObject(value) {
+export function isObject(value) {
   return isset(value) && value instanceof Object;
 }
-
-function isArray(value) {
+export function isArray(value) {
   return isset(value) && value instanceof Array;
 }
-
-function isString(value) {
+export function isString(value) {
   return isset(value) && typeof value === 'string';
 }
-
-function isNumber(value) {
+export function isNumber(value) {
   return isset(value) && typeof value === 'number';
 }
-
-function isUndefined(value) {
+export function isUndefined(value) {
   return typeof value === 'undefined';
 }
-
-function isset(value) {
+export function isset(value) {
   return value !== undefined;
 }
-
-function is(value) {
+export function is(value) {
   return isset(value) && !!value;
 }
-
-function isEqual(input1, input2) {
+export function isEqual(input1, input2) {
   return input1 === input2 || JSON.stringify(input1) === JSON.stringify(input2);
 }
-
-function isFragment(node) {
-  return isset(node) && node.nodeType === _globalWindow2['default'].Node.DOCUMENT_FRAGMENT_NODE;
+export function isFragment(node) {
+  return isset(node) && node.nodeType === WINDOW.Node.DOCUMENT_FRAGMENT_NODE;
 }
 
-var now = Date.now ? Date.now : function () {
+export var now = Date.now ? Date.now : function () {
   return Number(new Date());
 };
-exports.now = now;
-
-function rand() {
+export function rand() {
   return (Math.random() * 1e17).toString(36);
 }
-
-function result(object, key) {
+export function result(object, key) {
   if (isObject(object)) {
     var value = object[key];
     return isFunction(value) ? object[key]() : value;
   }
 }
-
-function inherits(protoProps, staticProps) {
+export function inherits(protoProps, staticProps) {
   // Helper function to correctly set up the prototype chain, for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
   // class properties to be extended.
@@ -188,7 +108,7 @@ function inherits(protoProps, staticProps) {
   extend(child, _parent, staticProps);
   // Set the prototype chain to inherit from `parent`, without calling
   // `parent`'s constructor function.
-  var Surrogate = function Surrogate() {
+  var Surrogate = function () {
     this.constructor = child;
   };
   Surrogate.prototype = _parent.prototype;
@@ -206,8 +126,7 @@ function inherits(protoProps, staticProps) {
 
   return child;
 }
-
-function pick(input, _keys) {
+export function pick(input, _keys) {
   /**
    * Creates a shallow clone of `object` composed of the specified properties.
    * Property names may be specified as individual arguments or as arrays of
@@ -225,10 +144,8 @@ function pick(input, _keys) {
   });
   return output;
 }
-
-function noop() {}
-
-function clone(value) {
+export function noop() {}
+export function clone(value) {
   if (isNode(value)) {
     return value.cloneNode(true);
   } else if (isObject(value)) {
@@ -237,38 +154,34 @@ function clone(value) {
     return value;
   }
 }
-
-function keys(o) {
+export function keys(o) {
   if (isObject(o)) {
     return Object.keys(o);
   }
   return [];
 }
-
-function outerHeight(el, withMargins) {
+export function outerHeight(el, withMargins) {
   if (isNode(this)) {
     el = this;
   }
   if (el) {
     var _height = el.offsetHeight;
     if (withMargins) {
-      var style = _globalWindow2['default'].getComputedStyle(el, null);
+      var style = WINDOW.getComputedStyle(el, null);
       _height += parseInt(style.marginTop) + parseInt(style.marginBottom, 10);
     }
     return _height;
   }
 }
-
-function outerWidth(withMargins) {
+export function outerWidth(withMargins) {
   var _width = this.offsetWidth;
   if (withMargins) {
-    var style = _globalWindow2['default'].getComputedStyle(this, null);
+    var style = WINDOW.getComputedStyle(this, null);
     _width += parseInt(style.marginLeft) + parseInt(style.marginRight, 10);
   }
   return width;
 }
-
-function offset(el) {
+export function offset(el) {
   if (isNode(this)) {
     el = this;
   }
@@ -277,39 +190,35 @@ function offset(el) {
   }
   var box = el.getBoundingClientRect();
   return {
-    top: box.top + _globalWindow2['default'].pageYOffset - _globalHtml2['default'].clientTop,
-    left: box.left + _globalWindow2['default'].pageXOffset - _globalHtml2['default'].clientLeft
+    top: box.top + WINDOW.pageYOffset - HTML.clientTop,
+    left: box.left + WINDOW.pageXOffset - HTML.clientLeft
   };
 }
-
-function height(value) {
+export function height(value) {
   if (isset(value)) {
     value = parseInt(value);
     this.style.height = value + 'px';
     return value;
   } else {
-    return parseInt(_globalWindow2['default'].getComputedStyle(this, null).height);
+    return parseInt(WINDOW.getComputedStyle(this, null).height);
   }
 }
-
-function width(value) {
+export function width(value) {
   if (isset(value)) {
     value = parseInt(value);
     this.style.width = value + 'px';
     return value;
   } else {
-    return parseInt(_globalWindow2['default'].getComputedStyle(this, null).width);
+    return parseInt(WINDOW.getComputedStyle(this, null).width);
   }
 }
-
-function position() {
+export function position() {
   return {
     left: this.offsetLeft,
     top: this.offsetTop
   };
 }
-
-function parent(el, filter) {
+export function parent(el, filter) {
   if (isNode(this)) {
     var tmp = [this, el];
     el = tmp[0];
@@ -332,7 +241,7 @@ function parent(el, filter) {
 
     var _parent = el;
     var ii = 1;
-    while (_parent = _parent.parentElement) {
+    while ((_parent = _parent.parentElement)) {
       if (filterFn(_parent, ii)) {
         return _parent;
       }
@@ -343,8 +252,7 @@ function parent(el, filter) {
     return el.parentElement;
   }
 }
-
-function parentAll(filter) {
+export function parentAll(filter) {
   if (isset(filter)) {
     var filterFn;
     if (isNumber(filter)) {
@@ -360,7 +268,7 @@ function parentAll(filter) {
     var _parent = this;
     var ii = 1;
     var _result = [];
-    while (_parent = _parent.parentElement) {
+    while ((_parent = _parent.parentElement)) {
       if (filterFn(_parent, ii)) {
         _result.push(_parent);
       }
@@ -370,14 +278,13 @@ function parentAll(filter) {
   } else {
     var __parent = this;
     var __result = [];
-    while (__parent = __parent.parentElement) {
+    while ((__parent = __parent.parentElement)) {
       __result.push(__parent);
     }
     return __result;
   }
 }
-
-function siblings(filter) {
+export function siblings(filter) {
   var _this = this;
   return this.parent().children.filter(function (child) {
     var valid = child !== _this;
@@ -387,12 +294,11 @@ function siblings(filter) {
     return valid;
   });
 }
-
-function prev(filter) {
+export function prev(filter) {
   if (isset(filter)) {
     var _prev = this;
     //var result = [];
-    while (_prev = _prev.previousElementSibling) {
+    while ((_prev = _prev.previousElementSibling)) {
       if (_prev.matches(filter)) {
         return _prev;
       }
@@ -402,12 +308,11 @@ function prev(filter) {
     return this.previousElementSibling;
   }
 }
-
-function prevAll(filter) {
+export function prevAll(filter) {
   if (isset(filter)) {
     var _prev = this;
     var __result = [];
-    while (_prev = _prev.previousElementSibling) {
+    while ((_prev = _prev.previousElementSibling)) {
       if (_prev.matches(filter)) {
         __result.push(_prev);
       }
@@ -416,17 +321,16 @@ function prevAll(filter) {
   } else {
     var __prev = this;
     var _result = [];
-    while (__prev = __prev.previousElementSibling) {
+    while ((__prev = __prev.previousElementSibling)) {
       _result.push(__prev);
     }
     return _result;
   }
 }
-
-function next(filter) {
+export function next(filter) {
   if (isset(filter)) {
     var _next = this;
-    while (_next = _next.nextElementSibling) {
+    while ((_next = _next.nextElementSibling)) {
       if (_next.matches(filter)) {
         return _next;
       }
@@ -436,12 +340,11 @@ function next(filter) {
     return this.nextElementSibling;
   }
 }
-
-function nextAll(filter) {
+export function nextAll(filter) {
   if (isset(filter)) {
     var _next = this;
     var __result = [];
-    while (_next = _next.nextElementSibling) {
+    while ((_next = _next.nextElementSibling)) {
       if (_next.matches(filter)) {
         __result.push(_next);
       }
@@ -450,14 +353,13 @@ function nextAll(filter) {
   } else {
     var __next = this;
     var _result = [];
-    while (__next = __next.nextElementSibling) {
+    while ((__next = __next.nextElementSibling)) {
       _result.push(__next);
     }
     return _result;
   }
 }
-
-function first(filter) {
+export function first(filter) {
   if (isset(filter)) {
     var children = this.children;
     if (isset(children) && children.length > 0) {
@@ -472,8 +374,7 @@ function first(filter) {
     return this.firstChild;
   }
 }
-
-function after(el, _html, _position) {
+export function after(el, _html, _position) {
   if (isNode(this)) {
     var tmp = [this, el, _html];
     el = tmp[0];
@@ -501,8 +402,7 @@ function after(el, _html, _position) {
     return '';
   }
 }
-
-function before(_html, _position) {
+export function before(_html, _position) {
   if (_position) {
     _position = 'beforeend';
   } else {
@@ -517,16 +417,14 @@ function before(_html, _position) {
   }
   return '';
 }
-
-function append(node) {
+export function append(node) {
   if (isNode(node)) {
     return this.parent().appendChild(node);
   } else if (isString(node)) {
     return this.parent().before(node, 1);
   }
 }
-
-function prepend(node) {
+export function prepend(node) {
   if (isNode(node)) {
     this.parent().insertBefore(node, this.parent().firstChild);
   } else if (isArray(node)) {
@@ -537,15 +435,13 @@ function prepend(node) {
   }
   return this;
 }
-
-function replaceWith(stringHTML) {
+export function replaceWith(stringHTML) {
   if (isset(stringHTML)) {
     this.outerHTML = stringHTML;
   }
   return this;
 }
-
-function css(el, ruleName, value) {
+export function css(el, ruleName, value) {
   if (isNode(this)) {
     var tmp = [this, el, ruleName];
     el = tmp[0];
@@ -562,13 +458,12 @@ function css(el, ruleName, value) {
       el.style[camelCase(ruleName)] = value;
       return value;
     } else {
-      return _globalWindow2['default'].getComputedStyle(el, null)[camelCase(ruleName)];
+      return WINDOW.getComputedStyle(el, null)[camelCase(ruleName)];
     }
   }
   return '';
 }
-
-function data(el, key, value) {
+export function data(el, key, value) {
   if (isNode(this)) {
     var _tmp = [this, el, key];
     el = _tmp[0];
@@ -596,8 +491,7 @@ function data(el, key, value) {
   }
   return cached;
 }
-
-function attr(name, value) {
+export function attr(name, value) {
   if (isObject(name)) {
     for (var ii in name) {
       this.setAttribute(ii, name[ii]);
@@ -613,8 +507,7 @@ function attr(name, value) {
   }
   return '';
 }
-
-function text(textString) {
+export function text(textString) {
   if (isset(textString)) {
     this.textContent = textString;
     return this;
@@ -622,8 +515,7 @@ function text(textString) {
     return this.textContent;
   }
 }
-
-function html(string) {
+export function html(string) {
   if (isset(string)) {
     this.innerHTML = string;
     return this;
@@ -631,6 +523,7 @@ function html(string) {
     return this.innerHTML;
   }
 }
+
 
 function camelCase(string) {
   return string.replace(/^-ms-/, 'ms-').replace(/-([\da-z])/gi, function (all, letter) {
@@ -654,6 +547,7 @@ function camelCase(string) {
   NLp[i] = HCp[i] = Ap[i] = nodeListToNode(i);
 }*/
 
+
 /*WINDOW.height = function () {
   return HTML.clientHeight;
 };
@@ -671,7 +565,7 @@ function docGabarits(name) {
 }
 */
 
-function throttle(func, delay) {
+export function throttle(func, delay) {
   if (isFunction(this)) {
     delay = func;
     func = this;
@@ -689,7 +583,7 @@ function throttle(func, delay) {
   };
 }
 
-function debounce(func, delay) {
+export function debounce(func, delay) {
   if (isFunction(this)) {
     delay = func;
     func = this;
