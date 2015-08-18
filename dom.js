@@ -58,7 +58,7 @@ Object.defineProperties(NLp, props);
 Object.defineProperties(HCp, props);
 
 function on(el, name, callback, context) {
-  if (_utils.isNode(this)) {
+  if (_utils.isNode(this) || _utils.isString(el) && this === W) {
     context = callback;
     callback = name;
     name = el;

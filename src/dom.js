@@ -5,7 +5,7 @@ var NLp = NodeList.prototype;
 var HCp = HTMLCollection.prototype;
 var Ap = Array.prototype;
 //var Ep = Element.prototype;
-import { isNode, isArray, isObject, isset, keys } from './utils';
+import { isNode, isString, isArray, isObject, isset, keys } from './utils';
 
 W.on = D.on = Np.on = on;
 W.off = D.off = Np.off = off;
@@ -51,7 +51,7 @@ Object.defineProperties(HCp, props);
 
 
 export function on(el, name, callback, context) {
-  if (isNode(this)) {
+  if (isNode(this) || (isString(el) && this === W)) {
     context = callback;
     callback = name;
     name = el;
