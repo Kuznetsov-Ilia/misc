@@ -1,8 +1,11 @@
 var D = document;
 var W = window;
-var Np = Node.prototype;
-var NLp = NodeList.prototype;
-var HCp = HTMLCollection.prototype;
+if (!W.Node) {
+  W.Node = W.Element;
+}
+var Np = W.Node.prototype;
+var NLp = W.NodeList.prototype;
+var HCp = W.HTMLCollection.prototype;
 var Ap = Array.prototype;
 //var Ep = Element.prototype;
 import { isNode, isString, isArray, isObject, isset, keys } from './utils';

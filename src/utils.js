@@ -1,26 +1,25 @@
 // inherit.js https://gist.github.com/RubaXa/8857525
-
-import WINDOW from 'global/window';
-import HTML from 'global/html';
+import {window, html as HTML} from 'global';
+if (!window.Node) {
+  window.Node = window.Element;
+}
 var CACHE = {};
 var CACHE_KEY = 0;
 
-export function extend(original, extended) {
-  if (arguments.length > 2) {
-    for (var i = 1, l = arguments.length; i < l; i++) {
-      extend(original, arguments[i]);
-    }
-  } else {
-    if (isObject(extended)) {
-      for (var key in extended) {
-        original[key] = extended[key];
-      }
-    }
-  }
-  return original;
-}
+export var extend = Object.assign;
+
 export function isObject(value) {
-  return typeof value === 'object';
+  return typeof value === 'object' && value !== null;
+}
+export function isEmpty(obj) {
+  if (!isObject(obj)) {
+    return false;
+  }
+  for (var i in obj) {
+    return true;
+    break;
+  }
+  return false;
 }
 export function isFunction(value) {
   return typeof value === 'function';
@@ -35,21 +34,20 @@ export function contains(where, value) {
 export function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
-export function isFunction(value) {
-  return isset(value) && value instanceof Function;
-}
-export function isNode(value) {
-  return isset(value) && value instanceof Node;
 
-  /*return !!(object && (
-    ((typeof Node === 'function' ? object instanceof Node : typeof object === 'object' &&
-    typeof object.nodeType === 'number' &&
-    typeof object.nodeName === 'string'))
-  ));*/
+export function isNode(value) {
+  return value instanceof window.Node;
+/*  var _isNode = typeof window.Node === 'undefined' ? legacyIsNode : actualIsNode;
+  isNode = _isNode;
+  return isNode(value);  
+  function legacyIsNode(value) {
+    return typeof node === 'object' && typeof node.nodeType === 'number' && typeof node.nodeName === 'string'
+  }
+  function actualIsNode(value) {
+    return value instanceof window.Node;
+  }*/
 }
-export function isObject(value) {
-  return isset(value) && value instanceof Object;
-}
+
 export function isArray(value) {
   return isset(value) && value instanceof Array;
 }
@@ -72,7 +70,7 @@ export function isEqual(input1, input2) {
   return input1 === input2 || JSON.stringify(input1) === JSON.stringify(input2);
 }
 export function isFragment(node) {
-  return isset(node) && node.nodeType === WINDOW.Node.DOCUMENT_FRAGMENT_NODE;
+  return isset(node) && node.nodeType === window.Node.DOCUMENT_FRAGMENT_NODE;
 }
 
 export var now = Date.now ? Date.now : function () {
@@ -167,7 +165,7 @@ export function outerHeight(el, withMargins) {
   if (el) {
     var _height = el.offsetHeight;
     if (withMargins) {
-      var style = WINDOW.getComputedStyle(el, null);
+      var style = window.getComputedStyle(el, null);
       _height += parseInt(style.marginTop) + parseInt(style.marginBottom, 10);
     }
     return _height;
@@ -176,7 +174,7 @@ export function outerHeight(el, withMargins) {
 export function outerWidth(withMargins) {
   var _width = this.offsetWidth;
   if (withMargins) {
-    var style = WINDOW.getComputedStyle(this, null);
+    var style = window.getComputedStyle(this, null);
     _width += parseInt(style.marginLeft) + parseInt(style.marginRight, 10);
   }
   return width;
@@ -190,8 +188,8 @@ export function offset(el) {
   }
   var box = el.getBoundingClientRect();
   return {
-    top: box.top + WINDOW.pageYOffset - HTML.clientTop,
-    left: box.left + WINDOW.pageXOffset - HTML.clientLeft
+    top: box.top + window.pageYOffset - HTML.clientTop,
+    left: box.left + window.pageXOffset - HTML.clientLeft
   };
 }
 export function height(value) {
@@ -200,7 +198,7 @@ export function height(value) {
     this.style.height = value + 'px';
     return value;
   } else {
-    return parseInt(WINDOW.getComputedStyle(this, null).height);
+    return parseInt(window.getComputedStyle(this, null).height);
   }
 }
 export function width(value) {
@@ -209,7 +207,7 @@ export function width(value) {
     this.style.width = value + 'px';
     return value;
   } else {
-    return parseInt(WINDOW.getComputedStyle(this, null).width);
+    return parseInt(window.getComputedStyle(this, null).width);
   }
 }
 export function position() {
@@ -458,7 +456,7 @@ export function css(el, ruleName, value) {
       el.style[camelCase(ruleName)] = value;
       return value;
     } else {
-      return WINDOW.getComputedStyle(el, null)[camelCase(ruleName)];
+      return window.getComputedStyle(el, null)[camelCase(ruleName)];
     }
   }
   return '';
@@ -548,10 +546,10 @@ function camelCase(string) {
 }*/
 
 
-/*WINDOW.height = function () {
+/*window.height = function () {
   return HTML.clientHeight;
 };
-WINDOW.width = function () {
+window.width = function () {
   return HTML.clientWidth;
 };*/
 

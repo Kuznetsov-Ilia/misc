@@ -7,14 +7,17 @@
     "get:shim": "wget -O dist/shim.js https://raw.githubusercontent.com/es-shims/es5-shim/master/es5-shim.min.js",
     "get:sham": "wget -O dist/sham.js https://raw.githubusercontent.com/es-shims/es5-shim/master/es5-sham.min.js",
     "get:shiv": "wget -O dist/shiv.js https://raw.githubusercontent.com/aFarkas/html5shiv/master/dist/html5shiv.min.js",
-
     "ss": "npm start && npm run polyfills && npm run ug && npm run cp",
     "start": "NODE_ENV=production babel src --out-dir .",
+    "otvet": "npm start && npm run polyfills && npm run ug && npm run cp:otvet",
+    "polyfills": "browserify polyfills.js dom.js dom4.js > dist/polyfills.js",
     
-    "polyfills": "NODE_ENV=production browserify polyfills.js dom.js dom4.js > dist/polyfills.js",
-    "ug": "cat dist/shim.js dist/sham.js dist/shiv.js dist/polyfills.js | uglifyjs -cm | tee dist/polyfills.min.js | gzip > dist/polyfills.min.js.gz",
-    "cp": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/polyfills.min.js",
-
+    "ug2": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js > dist/polyfills.min.js",
+    "ug": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -cm | tee dist/polyfills.min.js | gzip > dist/polyfills.min.js.gz",
+    
+    "cp:otvet": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapibig/app/js/",
+    "cp:otvet2": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/app/js/",
+    
     "polyfills:touch": "npm run polyfills:touch:local & npm run polyfills:touch:virtualko",
     "polyfills:touch:local": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm > ../touch.otvet.mail.ru/app/js/polyfills.min.js",
     "polyfills:touch:virtualko": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm > /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/polyfills.min.js",
@@ -43,6 +46,7 @@
     ]
   },
   "devDependencies": {
-    "global": "git+https://github.com/QiV/global.git#master"
+    "global": "git+https://github.com/QiV/global.git#master",
+    "spritesmith": "^1.3.2"
   }
 }

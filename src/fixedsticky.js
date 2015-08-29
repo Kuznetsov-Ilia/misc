@@ -1,11 +1,9 @@
+//import './fixedsticky.css';
 var W = window;
 var D = document;
 var B = document.body;
 var H = document.documentElement;
-import {
-  outerHeight, data, parent, offset, after, css, next, remove, throttle
-}
-from './utils';
+import { outerHeight, data, parent, offset, after, css, next, remove, throttle } from './utils';
 
 function featureTest(property, value, noPrefixes) {
   // Thanks Modernizr! https://github.com/phistuck/Modernizr/commit/3fb7217f5f8274e2f11fe6cfeda7cfaf9948a1f5

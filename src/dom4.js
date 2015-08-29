@@ -2,7 +2,6 @@
 /* jshint loopfunc: true, noempty: false*/
 // http://www.w3.org/TR/dom/#element
 
-var head;
 var property;
 var TemporaryPrototype;
 var TemporaryTokenList;
@@ -12,6 +11,7 @@ var indexOf = ArrayPrototype.indexOf;
 var slice = ArrayPrototype.slice;
 var splice = ArrayPrototype.splice;
 var join = ArrayPrototype.join;
+var push = ArrayPrototype.push;
 var defineProperty = Object.defineProperty;
 var document = window.document;
 var DocumentFragment = window.DocumentFragment;
@@ -157,7 +157,7 @@ DOMTokenList.prototype = {
     for (var j = 0, token; j < arguments.length; j++) {
       token = arguments[j];
       if (!this.contains(token)) {
-        properties.push.call(this, property);
+        push.call(this, property);
       }
     }
     if (this._isSVG) {
@@ -344,7 +344,7 @@ function DOMTokenList(node) {
     isSVG = typeof className === 'object',
     value = (isSVG ? className.baseVal : className).replace(trim, '');
   if (value.length) {
-    properties.push.apply(
+    push.apply(
       this,
       value.split(spaces)
     );

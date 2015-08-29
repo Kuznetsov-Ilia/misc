@@ -1,4 +1,21 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+
+exports.__esModule = true;
+var body = document.body;
+var html = document.documentElement;
+var _window = self || window;
+var process = {};
+exports["default"] = window;
+exports.window = _window;
+exports.body = body;
+exports.console = console;
+exports.document = document;
+exports.navigator = navigator;
+exports.location = location;
+exports.html = html;
+exports.process = process;
+},{}],2:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -12,9 +29,12 @@ var _utils = require('./utils');
 
 var D = document;
 var W = window;
-var Np = Node.prototype;
-var NLp = NodeList.prototype;
-var HCp = HTMLCollection.prototype;
+if (!W.Node) {
+  W.Node = W.Element;
+}
+var Np = W.Node.prototype;
+var NLp = W.NodeList.prototype;
+var HCp = W.HTMLCollection.prototype;
 var Ap = Array.prototype;
 
 W.on = D.on = Np.on = on;
@@ -59,7 +79,7 @@ Object.defineProperties(NLp, props);
 Object.defineProperties(HCp, props);
 
 function on(el, name, callback, context) {
-  if (_utils.isNode(this)) {
+  if (_utils.isNode(this) || _utils.isString(el) && this === W) {
     context = callback;
     callback = name;
     name = el;
@@ -248,14 +268,13 @@ function matchesAll(selector) {
   });
 }
 
-},{"./utils":6}],2:[function(require,module,exports){
+},{"./utils":5}],3:[function(require,module,exports){
 //https://github.com/WebReflection/dom4
 /* jshint loopfunc: true, noempty: false*/
 // http://www.w3.org/TR/dom/#element
 
 'use strict';
 
-var head;
 var property;
 var TemporaryPrototype;
 var TemporaryTokenList;
@@ -265,6 +284,7 @@ var indexOf = ArrayPrototype.indexOf;
 var slice = ArrayPrototype.slice;
 var splice = ArrayPrototype.splice;
 var join = ArrayPrototype.join;
+var push = ArrayPrototype.push;
 var defineProperty = Object.defineProperty;
 var document = window.document;
 var DocumentFragment = window.DocumentFragment;
@@ -389,7 +409,7 @@ DOMTokenList.prototype = {
     for (var j = 0, token; j < arguments.length; j++) {
       token = arguments[j];
       if (!this.contains(token)) {
-        properties.push.call(this, property);
+        push.call(this, property);
       }
     }
     if (this._isSVG) {
@@ -557,7 +577,7 @@ function DOMTokenList(node) {
       isSVG = typeof className === 'object',
       value = (isSVG ? className.baseVal : className).replace(trim, '');
   if (value.length) {
-    properties.push.apply(this, value.split(spaces));
+    push.apply(this, value.split(spaces));
   }
   this._isSVG = isSVG;
   this._ = node;
@@ -636,43 +656,8 @@ function textNodeIfString(node) {
   return typeof node === 'string' ? document.createTextNode(node) : node;
 }
 
-},{}],3:[function(require,module,exports){
-module.exports = {};
-
 },{}],4:[function(require,module,exports){
-(function (global){
-var mock = {
-  location: {
-    ancestorOrigins: {},
-    origin: "",
-    hash: "",
-    search: "",
-    pathname: "",
-    port: "",
-    hostname: "",
-    host: "",
-    protocol: "",
-    href: ""
-  }
-};
-
-if (typeof window !== "undefined") {
-    module.exports = window;
-} else if (typeof global !== "undefined") {
-    module.exports = Object.assign(global, mock);
-} else if (typeof self !== "undefined"){
-    module.exports = self;
-} else {
-    module.exports = mock
-}
-
-
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],5:[function(require,module,exports){
 'use strict';
-
-var _utils = require('./utils');
 
 window.$ = function () {
   return {
@@ -681,40 +666,47 @@ window.$ = function () {
     }
   };
 };
+
 var arrayProto = Array.prototype;
 var stringProto = String.prototype;
-
+var arrayProps = {};
+var stringProps = {};
 /* object */
-Object.assign = Object.assign || _utils.extend;
+
+Object.assign = Object.assign || extend;
 
 /* array */
 if (!arrayProto.find) {
-  arrayProto.find = function (predicate) {
-    if (this == null) {
-      throw new TypeError('Array.prototype.find called on null or undefined');
-    }
-    if (typeof predicate !== 'function') {
-      throw new TypeError('predicate must be a function');
-    }
-    var list = Object(this);
-    var length = list.length >>> 0;
-    var thisArg = arguments[1];
-    var value;
-
-    for (var i = 0; i < length; i++) {
-      value = list[i];
-      if (predicate.call(thisArg, value, i, list)) {
-        return value;
+  arrayProps.find = {
+    value: function value(predicate) {
+      if (this == null) {
+        throw new TypeError('Array.prototype.find called on null or undefined');
       }
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      var value;
+
+      for (var i = 0; i < length; i++) {
+        value = list[i];
+        if (predicate.call(thisArg, value, i, list)) {
+          return value;
+        }
+      }
+      return undefined;
     }
-    return undefined;
   };
 }
 if (!arrayProto.includes) {
-  arrayProto.includes = has;
+  arrayProps.includes = {
+    value: has
+  };
 }
-arrayProto.contains = has;
-arrayProto.has = has;
+arrayProps.contains = { value: has };
+arrayProps.has = { value: has };
 
 if (!Array.from) {
   Array.from = function (iterable) {
@@ -731,25 +723,33 @@ if (!Array.from) {
 if (!stringProto.includes) {
   stringProto.includes = has;
 }
-stringProto.contains = has;
-stringProto.has = has;
+stringProps.contains = { value: has };
+stringProps.has = { value: has };
+
 if (!stringProto.startsWith) {
-  stringProto.startsWith = function (string, position) {
-    if (!position) {
-      position = 0;
+  stringProps.startsWith = {
+    value: function value(string, position) {
+      if (!position) {
+        position = 0;
+      }
+      return this.indexOf(string, position) === position;
     }
-    return this.indexOf(string, position) == position;
   };
 }
 if (!stringProto.endsWith) {
-  stringProto.endsWith = function (string, position) {
-    var lastIndex;
-    position = position || this.length;
-    position = position - string.length;
-    lastIndex = this.lastIndexOf(string);
-    return -1 != lastIndex && lastIndex == position;
+  stringProps.endsWith = {
+    value: function value(string, position) {
+      var lastIndex;
+      position = position || this.length;
+      position = position - string.length;
+      lastIndex = this.lastIndexOf(string);
+      return lastIndex !== -1 && lastIndex === position;
+    }
   };
 }
+
+Object.defineProperties(arrayProto, arrayProps);
+Object.defineProperties(stringProto, stringProps);
 
 /* number */
 if (!Number.isFinite) {
@@ -777,21 +777,32 @@ if (!Number.parseFloat) {
 function has(it) {
   return this.indexOf(it) !== -1;
 }
+function extend(original, extended) {
+  if (arguments.length > 2) {
+    for (var i = 1, l = arguments.length; i < l; i++) {
+      extend(original, arguments[i]);
+    }
+  } else {
+    if (typeof extended === 'object' && extended !== null) {
+      for (var key in extended) {
+        original[key] = extended[key];
+      }
+    }
+  }
+  return original;
+}
 
-},{"./utils":6}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 // inherit.js https://gist.github.com/RubaXa/8857525
-
 'use strict';
 
 exports.__esModule = true;
-exports.extend = extend;
 exports.isObject = isObject;
+exports.isEmpty = isEmpty;
 exports.isFunction = isFunction;
 exports.contains = contains;
 exports.isRegExp = isRegExp;
-exports.isFunction = isFunction;
 exports.isNode = isNode;
-exports.isObject = isObject;
 exports.isArray = isArray;
 exports.isString = isString;
 exports.isNumber = isNumber;
@@ -834,38 +845,31 @@ exports.html = html;
 exports.throttle = throttle;
 exports.debounce = debounce;
 
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { 'default': obj };
+var _global = require('global');
+
+if (!_global.window.Node) {
+  _global.window.Node = _global.window.Element;
 }
-
-var _globalWindow = require('global/window');
-
-var _globalWindow2 = _interopRequireDefault(_globalWindow);
-
-var _globalHtml = require('global/html');
-
-var _globalHtml2 = _interopRequireDefault(_globalHtml);
-
 var CACHE = {};
 var CACHE_KEY = 0;
 
-function extend(original, extended) {
-  if (arguments.length > 2) {
-    for (var i = 1, l = arguments.length; i < l; i++) {
-      extend(original, arguments[i]);
-    }
-  } else {
-    if (isObject(extended)) {
-      for (var key in extended) {
-        original[key] = extended[key];
-      }
-    }
-  }
-  return original;
-}
+var extend = Object.assign;
+
+exports.extend = extend;
 
 function isObject(value) {
-  return typeof value === 'object';
+  return typeof value === 'object' && value !== null;
+}
+
+function isEmpty(obj) {
+  if (!isObject(obj)) {
+    return false;
+  }
+  for (var i in obj) {
+    return true;
+    break;
+  }
+  return false;
 }
 
 function isFunction(value) {
@@ -884,22 +888,17 @@ function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
 
-function isFunction(value) {
-  return isset(value) && value instanceof Function;
-}
-
 function isNode(value) {
-  return isset(value) && value instanceof Node;
-
-  /*return !!(object && (
-    ((typeof Node === 'function' ? object instanceof Node : typeof object === 'object' &&
-    typeof object.nodeType === 'number' &&
-    typeof object.nodeName === 'string'))
-  ));*/
-}
-
-function isObject(value) {
-  return isset(value) && value instanceof Object;
+  return value instanceof _global.window.Node;
+  /*  var _isNode = typeof window.Node === 'undefined' ? legacyIsNode : actualIsNode;
+    isNode = _isNode;
+    return isNode(value);  
+    function legacyIsNode(value) {
+      return typeof node === 'object' && typeof node.nodeType === 'number' && typeof node.nodeName === 'string'
+    }
+    function actualIsNode(value) {
+      return value instanceof window.Node;
+    }*/
 }
 
 function isArray(value) {
@@ -931,7 +930,7 @@ function isEqual(input1, input2) {
 }
 
 function isFragment(node) {
-  return isset(node) && node.nodeType === _globalWindow2['default'].Node.DOCUMENT_FRAGMENT_NODE;
+  return isset(node) && node.nodeType === _global.window.Node.DOCUMENT_FRAGMENT_NODE;
 }
 
 var now = Date.now ? Date.now : function () {
@@ -1035,7 +1034,7 @@ function outerHeight(el, withMargins) {
   if (el) {
     var _height = el.offsetHeight;
     if (withMargins) {
-      var style = _globalWindow2['default'].getComputedStyle(el, null);
+      var style = _global.window.getComputedStyle(el, null);
       _height += parseInt(style.marginTop) + parseInt(style.marginBottom, 10);
     }
     return _height;
@@ -1045,7 +1044,7 @@ function outerHeight(el, withMargins) {
 function outerWidth(withMargins) {
   var _width = this.offsetWidth;
   if (withMargins) {
-    var style = _globalWindow2['default'].getComputedStyle(this, null);
+    var style = _global.window.getComputedStyle(this, null);
     _width += parseInt(style.marginLeft) + parseInt(style.marginRight, 10);
   }
   return width;
@@ -1060,8 +1059,8 @@ function offset(el) {
   }
   var box = el.getBoundingClientRect();
   return {
-    top: box.top + _globalWindow2['default'].pageYOffset - _globalHtml2['default'].clientTop,
-    left: box.left + _globalWindow2['default'].pageXOffset - _globalHtml2['default'].clientLeft
+    top: box.top + _global.window.pageYOffset - _global.html.clientTop,
+    left: box.left + _global.window.pageXOffset - _global.html.clientLeft
   };
 }
 
@@ -1071,7 +1070,7 @@ function height(value) {
     this.style.height = value + 'px';
     return value;
   } else {
-    return parseInt(_globalWindow2['default'].getComputedStyle(this, null).height);
+    return parseInt(_global.window.getComputedStyle(this, null).height);
   }
 }
 
@@ -1081,7 +1080,7 @@ function width(value) {
     this.style.width = value + 'px';
     return value;
   } else {
-    return parseInt(_globalWindow2['default'].getComputedStyle(this, null).width);
+    return parseInt(_global.window.getComputedStyle(this, null).width);
   }
 }
 
@@ -1345,7 +1344,7 @@ function css(el, ruleName, value) {
       el.style[camelCase(ruleName)] = value;
       return value;
     } else {
-      return _globalWindow2['default'].getComputedStyle(el, null)[camelCase(ruleName)];
+      return _global.window.getComputedStyle(el, null)[camelCase(ruleName)];
     }
   }
   return '';
@@ -1437,10 +1436,10 @@ function camelCase(string) {
   NLp[i] = HCp[i] = Ap[i] = nodeListToNode(i);
 }*/
 
-/*WINDOW.height = function () {
+/*window.height = function () {
   return HTML.clientHeight;
 };
-WINDOW.width = function () {
+window.width = function () {
   return HTML.clientWidth;
 };*/
 
@@ -1493,4 +1492,4 @@ function debounce(func, delay) {
   NLp[method] = HCp[method] = Ap[method];
 });*/
 
-},{"global/html":3,"global/window":4}]},{},[5,1,2]);
+},{"global":1}]},{},[4,2,3]);

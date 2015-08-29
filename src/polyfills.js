@@ -1,4 +1,3 @@
-import { extend } from './utils';
 window.$ = function () {
   return {
     css() {
@@ -6,40 +5,47 @@ window.$ = function () {
     }
   };
 };
+
 var arrayProto = Array.prototype;
 var stringProto = String.prototype;
-
+var arrayProps = {};
+var stringProps = {};
 /* object */
+
 Object.assign = Object.assign || extend;
 
 /* array */
 if (!arrayProto.find) {
-  arrayProto.find = function (predicate) {
-    if (this == null) {
-      throw new TypeError('Array.prototype.find called on null or undefined');
-    }
-    if (typeof predicate !== 'function') {
-      throw new TypeError('predicate must be a function');
-    }
-    var list = Object(this);
-    var length = list.length >>> 0;
-    var thisArg = arguments[1];
-    var value;
-
-    for (var i = 0; i < length; i++) {
-      value = list[i];
-      if (predicate.call(thisArg, value, i, list)) {
-        return value;
+  arrayProps.find = {
+    value: function (predicate) {
+      if (this == null) {
+        throw new TypeError('Array.prototype.find called on null or undefined');
       }
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      var value;
+
+      for (var i = 0; i < length; i++) {
+        value = list[i];
+        if (predicate.call(thisArg, value, i, list)) {
+          return value;
+        }
+      }
+      return undefined;
     }
-    return undefined;
   };
 }
 if (!arrayProto.includes) {
-  arrayProto.includes = has;
+  arrayProps.includes = {
+    value: has
+  };
 }
-arrayProto.contains = has;
-arrayProto.has = has;
+arrayProps.contains = {value: has};
+arrayProps.has = {value: has};
 
 if (!Array.from) {
   Array.from = function (iterable) {
@@ -56,25 +62,33 @@ if (!Array.from) {
 if (!stringProto.includes) {
   stringProto.includes = has;
 }
-stringProto.contains = has;
-stringProto.has = has;
+stringProps.contains = {value: has};
+stringProps.has = {value: has};
+
 if (!stringProto.startsWith) {
-  stringProto.startsWith = function (string, position) {
-    if (!position) {
-      position = 0;
+  stringProps.startsWith = {
+    value: function (string, position) {
+      if (!position) {
+        position = 0;
+      }
+      return this.indexOf(string, position) === position;
     }
-    return this.indexOf(string, position) == position;
   };
 }
 if (!stringProto.endsWith) {
-  stringProto.endsWith = function (string, position) {
-    var lastIndex;
-    position = position || this.length;
-    position = position - string.length;
-    lastIndex = this.lastIndexOf(string);
-    return -1 != lastIndex && lastIndex == position;
+  stringProps.endsWith = {
+    value: function (string, position) {
+      var lastIndex;
+      position = position || this.length;
+      position = position - string.length;
+      lastIndex = this.lastIndexOf(string);
+      return lastIndex !== -1 && lastIndex === position;
+    }
   };
 }
+
+Object.defineProperties(arrayProto, arrayProps);
+Object.defineProperties(stringProto, stringProps);
 
 /* number */
 if (!Number.isFinite) {
@@ -103,4 +117,18 @@ if (!Number.parseFloat) {
 
 function has(it) {
   return this.indexOf(it) !== -1;
+}
+function extend(original, extended) {
+  if (arguments.length > 2) {
+    for (var i = 1, l = arguments.length; i < l; i++) {
+      extend(original, arguments[i]);
+    }
+  } else {
+    if (typeof extended === 'object' && extended !== null) {
+      for (var key in extended) {
+        original[key] = extended[key];
+      }
+    }
+  }
+  return original;
 }

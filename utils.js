@@ -1,16 +1,13 @@
 // inherit.js https://gist.github.com/RubaXa/8857525
-
 'use strict';
 
 exports.__esModule = true;
-exports.extend = extend;
 exports.isObject = isObject;
+exports.isEmpty = isEmpty;
 exports.isFunction = isFunction;
 exports.contains = contains;
 exports.isRegExp = isRegExp;
-exports.isFunction = isFunction;
 exports.isNode = isNode;
-exports.isObject = isObject;
 exports.isArray = isArray;
 exports.isString = isString;
 exports.isNumber = isNumber;
@@ -53,36 +50,31 @@ exports.html = html;
 exports.throttle = throttle;
 exports.debounce = debounce;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+var _global = require('global');
 
-var _globalWindow = require('global/window');
-
-var _globalWindow2 = _interopRequireDefault(_globalWindow);
-
-var _globalHtml = require('global/html');
-
-var _globalHtml2 = _interopRequireDefault(_globalHtml);
-
+if (!_global.window.Node) {
+  _global.window.Node = _global.window.Element;
+}
 var CACHE = {};
 var CACHE_KEY = 0;
 
-function extend(original, extended) {
-  if (arguments.length > 2) {
-    for (var i = 1, l = arguments.length; i < l; i++) {
-      extend(original, arguments[i]);
-    }
-  } else {
-    if (isObject(extended)) {
-      for (var key in extended) {
-        original[key] = extended[key];
-      }
-    }
-  }
-  return original;
-}
+var extend = Object.assign;
+
+exports.extend = extend;
 
 function isObject(value) {
-  return typeof value === 'object';
+  return typeof value === 'object' && value !== null;
+}
+
+function isEmpty(obj) {
+  if (!isObject(obj)) {
+    return false;
+  }
+  for (var i in obj) {
+    return true;
+    break;
+  }
+  return false;
 }
 
 function isFunction(value) {
@@ -101,22 +93,17 @@ function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
 
-function isFunction(value) {
-  return isset(value) && value instanceof Function;
-}
-
 function isNode(value) {
-  return isset(value) && value instanceof Node;
-
-  /*return !!(object && (
-    ((typeof Node === 'function' ? object instanceof Node : typeof object === 'object' &&
-    typeof object.nodeType === 'number' &&
-    typeof object.nodeName === 'string'))
-  ));*/
-}
-
-function isObject(value) {
-  return isset(value) && value instanceof Object;
+  return value instanceof _global.window.Node;
+  /*  var _isNode = typeof window.Node === 'undefined' ? legacyIsNode : actualIsNode;
+    isNode = _isNode;
+    return isNode(value);  
+    function legacyIsNode(value) {
+      return typeof node === 'object' && typeof node.nodeType === 'number' && typeof node.nodeName === 'string'
+    }
+    function actualIsNode(value) {
+      return value instanceof window.Node;
+    }*/
 }
 
 function isArray(value) {
@@ -148,7 +135,7 @@ function isEqual(input1, input2) {
 }
 
 function isFragment(node) {
-  return isset(node) && node.nodeType === _globalWindow2['default'].Node.DOCUMENT_FRAGMENT_NODE;
+  return isset(node) && node.nodeType === _global.window.Node.DOCUMENT_FRAGMENT_NODE;
 }
 
 var now = Date.now ? Date.now : function () {
@@ -252,7 +239,7 @@ function outerHeight(el, withMargins) {
   if (el) {
     var _height = el.offsetHeight;
     if (withMargins) {
-      var style = _globalWindow2['default'].getComputedStyle(el, null);
+      var style = _global.window.getComputedStyle(el, null);
       _height += parseInt(style.marginTop) + parseInt(style.marginBottom, 10);
     }
     return _height;
@@ -262,7 +249,7 @@ function outerHeight(el, withMargins) {
 function outerWidth(withMargins) {
   var _width = this.offsetWidth;
   if (withMargins) {
-    var style = _globalWindow2['default'].getComputedStyle(this, null);
+    var style = _global.window.getComputedStyle(this, null);
     _width += parseInt(style.marginLeft) + parseInt(style.marginRight, 10);
   }
   return width;
@@ -277,8 +264,8 @@ function offset(el) {
   }
   var box = el.getBoundingClientRect();
   return {
-    top: box.top + _globalWindow2['default'].pageYOffset - _globalHtml2['default'].clientTop,
-    left: box.left + _globalWindow2['default'].pageXOffset - _globalHtml2['default'].clientLeft
+    top: box.top + _global.window.pageYOffset - _global.html.clientTop,
+    left: box.left + _global.window.pageXOffset - _global.html.clientLeft
   };
 }
 
@@ -288,7 +275,7 @@ function height(value) {
     this.style.height = value + 'px';
     return value;
   } else {
-    return parseInt(_globalWindow2['default'].getComputedStyle(this, null).height);
+    return parseInt(_global.window.getComputedStyle(this, null).height);
   }
 }
 
@@ -298,7 +285,7 @@ function width(value) {
     this.style.width = value + 'px';
     return value;
   } else {
-    return parseInt(_globalWindow2['default'].getComputedStyle(this, null).width);
+    return parseInt(_global.window.getComputedStyle(this, null).width);
   }
 }
 
@@ -562,7 +549,7 @@ function css(el, ruleName, value) {
       el.style[camelCase(ruleName)] = value;
       return value;
     } else {
-      return _globalWindow2['default'].getComputedStyle(el, null)[camelCase(ruleName)];
+      return _global.window.getComputedStyle(el, null)[camelCase(ruleName)];
     }
   }
   return '';
@@ -654,10 +641,10 @@ function camelCase(string) {
   NLp[i] = HCp[i] = Ap[i] = nodeListToNode(i);
 }*/
 
-/*WINDOW.height = function () {
+/*window.height = function () {
   return HTML.clientHeight;
 };
-WINDOW.width = function () {
+window.width = function () {
   return HTML.clientWidth;
 };*/
 

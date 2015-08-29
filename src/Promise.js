@@ -53,7 +53,7 @@ function _then(promise, method, callback) {
  * @returns {Promise}
  */
 
-function Promise(executor) {
+function Promise(executor, abort, progress) {
   var _completed = false;
   var _args;
   var _doneFn = [];
@@ -97,7 +97,8 @@ function Promise(executor) {
     },
 
     notify: noop, // jQuery support
-    progress: noop, // jQuery support
+    abort: abort || noop, // jQuery support
+    progress: progress || noop, // jQuery support
     promise: function () {
       // jQuery support
       return dfd;
