@@ -46,15 +46,15 @@ exports.css = css;
 exports.data = data;
 exports.attr = attr;
 exports.text = text;
+exports.clear = clear;
 exports.html = html;
 exports.throttle = throttle;
 exports.debounce = debounce;
+exports.encode = encode;
+exports.strip_tags = strip_tags;
 
 var _global = require('global');
 
-if (!_global.window.Node) {
-  _global.window.Node = _global.window.Element;
-}
 var CACHE = {};
 var CACHE_KEY = 0;
 
@@ -95,19 +95,11 @@ function isRegExp(value) {
 
 function isNode(value) {
   return value instanceof _global.window.Node;
-  /*  var _isNode = typeof window.Node === 'undefined' ? legacyIsNode : actualIsNode;
-    isNode = _isNode;
-    return isNode(value);  
-    function legacyIsNode(value) {
-      return typeof node === 'object' && typeof node.nodeType === 'number' && typeof node.nodeName === 'string'
-    }
-    function actualIsNode(value) {
-      return value instanceof window.Node;
-    }*/
 }
 
 function isArray(value) {
-  return isset(value) && value instanceof Array;
+  return Array.isArray(value);
+  //return isset(value) && value instanceof Array;
 }
 
 function isString(value) {
@@ -144,7 +136,7 @@ var now = Date.now ? Date.now : function () {
 exports.now = now;
 
 function rand() {
-  return (Math.random() * 1e17).toString(36);
+  return (Math.random() * 1e17).toString(36).replace('.', '');
 }
 
 function result(object, key) {
@@ -610,9 +602,20 @@ function text(textString) {
   }
 }
 
+function clear(el) {
+  //delete CACHE[el.__CACHE_KEY__];
+  //el.handlers = [];
+}
+
 function html(string) {
   if (isset(string)) {
     this.innerHTML = string;
+    var scripts = this.getElementsByTagName('script');
+    if (scripts) {
+      scripts.forEach(function (script) {
+        return new Function(script.innerHTML || script.text || '');
+      });
+    }
     return this;
   } else {
     return this.innerHTML;
@@ -641,12 +644,12 @@ function camelCase(string) {
   NLp[i] = HCp[i] = Ap[i] = nodeListToNode(i);
 }*/
 
-/*window.height = function () {
-  return HTML.clientHeight;
+_global.window.height = function () {
+  return _global.html.clientHeight;
 };
-window.width = function () {
-  return HTML.clientWidth;
-};*/
+_global.window.width = function () {
+  return _global.html.clientWidth;
+};
 
 //D.height = docGabarits('height');
 //D.width = docGabarits('width');
@@ -689,10 +692,15 @@ function debounce(func, delay) {
   };
 }
 
-/*[ //EC5
-  'some', 'every', 'filter', 'map', 'reduce', 'reduceRight',
-  //Array
-  'join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf'
-].forEach(function (method) {
-  NLp[method] = HCp[method] = Ap[method];
-});*/
+function encode(str) {
+  return encodeURIComponent(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
+}
+
+var stripTagsRegExp;
+
+function strip_tags(str) {
+  if (typeof stripTagsRegExp === undefined) {
+    stripTagsRegExp = /<\/?[^>]+>/gi;
+  }
+  return str.replace(stripTagsRegExp, '');
+}

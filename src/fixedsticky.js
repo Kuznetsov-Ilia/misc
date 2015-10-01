@@ -1,14 +1,11 @@
 //import './fixedsticky.css';
-var W = window;
-var D = document;
-var B = document.body;
-var H = document.documentElement;
+import {window, document, body, html} from 'global';
 import { outerHeight, data, parent, offset, after, css, next, remove, throttle } from './utils';
 
 function featureTest(property, value, noPrefixes) {
   // Thanks Modernizr! https://github.com/phistuck/Modernizr/commit/3fb7217f5f8274e2f11fe6cfeda7cfaf9948a1f5
   var prop = property + ':',
-    el = D.createElement('test'),
+    el = document.createElement('test'),
     mStyle = el.style;
 
   if (!noPrefixes) {
@@ -43,11 +40,11 @@ var FixedSticky = {
     // Thanks jQuery!
     var prop = 'pageYOffset',
       method = 'scrollTop';
-    return W ? (prop in W) ? W[prop] : H[method] : B[method];
+    return window ? (prop in window) ? window[prop] : html[method] : body[method];
   },
   bypass: function () {
     // Check native sticky, check fixed and if fixed-fixed is also included on the page and is supported
-    return (FixedSticky.tests.sticky && !FixedSticky.optOut) || !FixedSticky.tests.fixed || W.FixedFixed && !H.classList.contains('fixed-supported');
+    return (FixedSticky.tests.sticky && !FixedSticky.optOut) || !FixedSticky.tests.fixed || window.FixedFixed && !html.classList.contains('fixed-supported');
   },
   update: function (el) {
     if (!el.offsetWidth) {
@@ -62,7 +59,7 @@ var FixedSticky = {
         el.classList[turnOn ? 'add' : 'remove'](FixedSticky.classes.active);
         el.classList[!turnOn ? 'add' : 'remove'](FixedSticky.classes.inactive);
       },
-      viewportHeight = H.clientHeight,
+      viewportHeight = html.clientHeight,
       position = data(el, FixedSticky.keys.position),
       skipSettingToFixed,
       elTop,
@@ -131,7 +128,7 @@ var FixedSticky = {
     if (FixedSticky.bypass()) {
       return el;
     }
-    W.off('.fixedsticky');
+    window.off('.fixedsticky');
     el.classList.remove(FixedSticky.classes.active, FixedSticky.classes.inactive);
     next(el, '.' + FixedSticky.classes.clone);
     remove(el);
@@ -145,30 +142,20 @@ var FixedSticky = {
 
     FixedSticky.update(el);
 
-    W.on({
-      'scroll.fixedsticky': throttle(function () {
-        FixedSticky.update(el);
-      }, 30),
-      'resize.fixedsticky': throttle(function () {
+    window.on({
+      'scroll.fixedsticky': throttle(() => { FixedSticky.update(el) }, 30),
+      'resize.fixedsticky': throttle(() => {
         if (el.classList.contains(FixedSticky.classes.active)) {
           FixedSticky.update(el);
         }
       }, 30)
     });
-    /*W.on('scroll.fixedsticky', throttle(function () {
-      FixedSticky.update(el);
-    }, 30));
-    W.on('resize.fixedsticky', throttle(function () {
-      if (el.classList.contains(FixedSticky.classes.active)) {
-        FixedSticky.update(el);
-      }
-    }, 30));*/
   }
 };
 
 // Add fallback when fixed-fixed is not available.
-if (!W.FixedFixed) {
-  H.classList.add(FixedSticky.classes.withoutFixedFixed);
+if (!window.FixedFixed) {
+  html.classList.add(FixedSticky.classes.withoutFixedFixed);
 }
 
 export default function (el, method) {

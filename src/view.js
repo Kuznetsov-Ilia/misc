@@ -6,6 +6,9 @@ var UID = 0;
 
 function View (options={}) {
   this.cid = UID++;
+  if (isFunction(options.stopPreloader)){
+    this.stopPreloader = options.stopPreloader;
+  }
   if (this.init !== noop) {
     this.init(options);
   }

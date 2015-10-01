@@ -97,12 +97,21 @@ function Promise(executor, abort, progress) {
     },
 
     notify: noop, // jQuery support
-    abort: abort || noop, // jQuery support
+    abort: () => {
+      _doneFn = [];
+      _failFn = [];
+      _completed = true;
+    }, // jQuery support
     progress: progress || noop, // jQuery support
     promise: function () {
       // jQuery support
       return dfd;
     },
+
+    /**
+     * Событие по которому убиваем промис
+     */
+    ttl: ttl,
 
 
     /**
@@ -335,3 +344,22 @@ Promise.map = function (map) {
     return results;
   });
 };
+
+
+function ttl(eventName, eventEmiter) {
+  var XHR = this.XHR;
+  if (eventName === 'remove') {
+    eventEmiter.add([{ // View.prototype.add
+      remove: remove
+    }]);
+  } else {
+    eventEmiter.once(eventName, remove)
+  }
+  function remove() {
+    if (XHR.status === 200) {
+      return;
+    }
+    XHR.abort();
+  }
+  return this;
+}

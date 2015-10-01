@@ -15,6 +15,9 @@ function View() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
   this.cid = UID++;
+  if (_utils.isFunction(options.stopPreloader)) {
+    this.stopPreloader = options.stopPreloader;
+  }
   if (this.init !== _utils.noop) {
     this.init(options);
   }

@@ -11,9 +11,6 @@ var _utils = require('./utils');
 
 var D = document;
 var W = window;
-if (!W.Node) {
-  W.Node = W.Element;
-}
 var Np = W.Node.prototype;
 var NLp = W.NodeList.prototype;
 var HCp = W.HTMLCollection.prototype;
@@ -26,7 +23,6 @@ W.find = Np.find = D.find = find;
 W.filter = Np.filter = D.filter = /*W.$ = Np.$ = D.$ =*/filter;
 W.handlers = {};
 D.handlers = {};
-Np.handlers = {};
 
 /*var base = {on, off, trigger, find, filter};
 var singleProps = Object.keys(base).reduce((acc, value) => {
@@ -61,7 +57,7 @@ Object.defineProperties(NLp, props);
 Object.defineProperties(HCp, props);
 
 function on(el, name, callback, context) {
-  if (_utils.isNode(this) || _utils.isString(el) && this === W) {
+  if (_utils.isNode(this) || (_utils.isString(el) || _utils.isObject(el) && this === W)) {
     context = callback;
     callback = name;
     name = el;
@@ -92,6 +88,7 @@ function on(el, name, callback, context) {
     } else {
       el.addEventListener(eventName, delegate(types[1], handler), false);
     }
+    el.handlers = el.handlers || [];
     el.handlers[name] = el.handlers[name] || [];
     el.handlers[name].push(handler);
   }
@@ -144,9 +141,6 @@ function off(el, event, fn) {
 }
 
 function find(selector) {
-  /*  if (typeof selector === 'function') {
-    return Ap.find
-  }*/
   switch (selector.charAt(0)) {
     case '#':
       return D.getElementById(selector.substr(1));
@@ -160,7 +154,7 @@ function find(selector) {
 }
 
 function filter(selector) {
-  return this.querySelectorAll(selector || '☺');
+  return this.querySelectorAll(selector || '☺') || [];
 }
 
 function delegate(selector, handler) {
@@ -242,7 +236,7 @@ function filterAll(selector) {
       result.push(r);
     }
   });
-  return result.length ? result : null;
+  return result.length ? result : [];
 }
 function matchesAll(selector) {
   return this.every(function (node) {

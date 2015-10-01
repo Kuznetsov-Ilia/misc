@@ -3,14 +3,27 @@
   "version": "0.0.1",
   "description": "misc",
   "scripts": {
+    "watch": "NODE_ENV=production babel src --out-dir . --watch",
+    "start": "NODE_ENV=production babel src --out-dir .",
+    
+    "otvet": "npm start && npm run polyfills && npm run ug:otvet && npm run cp:otvet:dev",
+    "polyfills": "browserify polyfills.js dom.js dom4.js > dist/polyfills.js",
+    "ug:otvet": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -cm > dist/polyfills.min.js",
+    "cp:otvet:dev": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/dev",
+
     "get:all": "npm run get:shim & npm run get:sham & npm run get:shiv",
     "get:shim": "wget -O dist/shim.js https://raw.githubusercontent.com/es-shims/es5-shim/master/es5-shim.min.js",
     "get:sham": "wget -O dist/sham.js https://raw.githubusercontent.com/es-shims/es5-shim/master/es5-sham.min.js",
     "get:shiv": "wget -O dist/shiv.js https://raw.githubusercontent.com/aFarkas/html5shiv/master/dist/html5shiv.min.js",
+
+    "qcms2": "browserify polyfills.js dom.js dom4.js | uglifyjs -cm | gzip > ../qcms/frontend/build/polyfills.min.js.gz",
+    "qcms": "browserify polyfills.js dom.js dom4.js | uglifyjs -cm > ../qcms/frontend/build/polyfills.min.js.gz",
+
+    "up": "npm start && npm run polyfills && npm run ug",
+
+
     "ss": "npm start && npm run polyfills && npm run ug && npm run cp",
-    "start": "NODE_ENV=production babel src --out-dir .",
-    "otvet": "npm start && npm run polyfills && npm run ug && npm run cp:otvet",
-    "polyfills": "browserify polyfills.js dom.js dom4.js > dist/polyfills.js",
+    
     
     "ug2": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js > dist/polyfills.min.js",
     "ug": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -cm | tee dist/polyfills.min.js | gzip > dist/polyfills.min.js.gz",

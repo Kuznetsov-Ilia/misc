@@ -1,7 +1,7 @@
 //https://github.com/WebReflection/dom4
 /* jshint loopfunc: true, noempty: false*/
 // http://www.w3.org/TR/dom/#element
-
+import {window} from 'global';
 var property;
 var TemporaryPrototype;
 var TemporaryTokenList;

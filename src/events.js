@@ -201,7 +201,8 @@ function eventsApi(obj, action, name, rest) {
 // triggering events. Tries to keep the usual cases speedy (most internal
 // Backbone events have 3 arguments).
 function triggerEvents(events, args) {
-  var ev, i = -1,
+  var ev,
+    i = -1,
     l = events.length,
     a1 = args[0],
     a2 = args[1],

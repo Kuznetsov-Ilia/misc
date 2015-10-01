@@ -1,8 +1,5 @@
 // inherit.js https://gist.github.com/RubaXa/8857525
 import {window, html as HTML} from 'global';
-if (!window.Node) {
-  window.Node = window.Element;
-}
 var CACHE = {};
 var CACHE_KEY = 0;
 
@@ -37,19 +34,11 @@ export function isRegExp(value) {
 
 export function isNode(value) {
   return value instanceof window.Node;
-/*  var _isNode = typeof window.Node === 'undefined' ? legacyIsNode : actualIsNode;
-  isNode = _isNode;
-  return isNode(value);  
-  function legacyIsNode(value) {
-    return typeof node === 'object' && typeof node.nodeType === 'number' && typeof node.nodeName === 'string'
-  }
-  function actualIsNode(value) {
-    return value instanceof window.Node;
-  }*/
 }
 
 export function isArray(value) {
-  return isset(value) && value instanceof Array;
+  return Array.isArray(value);
+  //return isset(value) && value instanceof Array;
 }
 export function isString(value) {
   return isset(value) && typeof value === 'string';
@@ -72,12 +61,11 @@ export function isEqual(input1, input2) {
 export function isFragment(node) {
   return isset(node) && node.nodeType === window.Node.DOCUMENT_FRAGMENT_NODE;
 }
-
 export var now = Date.now ? Date.now : function () {
   return Number(new Date());
 };
 export function rand() {
-  return (Math.random() * 1e17).toString(36);
+  return (Math.random() * 1e17).toString(36).replace('.', '');
 }
 export function result(object, key) {
   if (isObject(object)) {
@@ -513,9 +501,18 @@ export function text(textString) {
     return this.textContent;
   }
 }
+
+export function clear(el) {
+  //delete CACHE[el.__CACHE_KEY__];
+  //el.handlers = [];
+}
 export function html(string) {
   if (isset(string)) {
     this.innerHTML = string;
+    var scripts = this.getElementsByTagName('script');
+    if (scripts) {
+      scripts.forEach(script => new Function(script.innerHTML || script.text || ''));
+    }
     return this;
   } else {
     return this.innerHTML;
@@ -546,12 +543,12 @@ function camelCase(string) {
 }*/
 
 
-/*window.height = function () {
+window.height = function () {
   return HTML.clientHeight;
 };
 window.width = function () {
   return HTML.clientWidth;
-};*/
+};
 
 //D.height = docGabarits('height');
 //D.width = docGabarits('width');
@@ -594,10 +591,13 @@ export function debounce(func, delay) {
   };
 }
 
-/*[ //EC5
-  'some', 'every', 'filter', 'map', 'reduce', 'reduceRight',
-  //Array
-  'join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf'
-].forEach(function (method) {
-  NLp[method] = HCp[method] = Ap[method];
-});*/
+export function encode(str) {
+  return encodeURIComponent(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
+}
+var stripTagsRegExp;
+export function strip_tags(str) {
+  if (typeof stripTagsRegExp === undefined) {
+    stripTagsRegExp = /<\/?[^>]+>/gi;
+  }
+  return str.replace(stripTagsRegExp, '');
+}

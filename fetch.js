@@ -73,7 +73,7 @@ function prepare(callback) {
       options.headers['Accept-charset'] = options.charset;
     }
 
-    callback(url, options);
+    return callback(url, options);
   };
 }
 

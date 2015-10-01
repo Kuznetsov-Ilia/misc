@@ -26,6 +26,7 @@ function Router(options) {
   if (options.routes) {
     this.routes = options.routes;
   }
+  this.history = _history2['default'];
   bindRoutes(this);
   if (_utils.isFunction(this.init)) {
     this.init(options);
@@ -51,12 +52,12 @@ Object.assign(_events.Eventable(Router.prototype), {
       callback = this[name];
     }
     var router = this;
-    _history2['default'].route(_route, function (fragment) {
+    this.history.route(_route, function (fragment) {
       var args = extractParameters(_route, fragment);
       if (router.execute(callback, args, name) !== false) {
-        router.trigger.apply(router, ['route:' + name].concat(args));
+        //router.trigger.apply(router, ['route:' + name].concat(args));
         router.trigger('route', name, args);
-        _history2['default'].trigger('route', router, name, args);
+        //HISTORY.trigger('route', router, name, args);
       }
     });
     return this;
@@ -72,7 +73,7 @@ Object.assign(_events.Eventable(Router.prototype), {
 
   // Simple proxy to `HISTORY` to save a fragment into the history.
   navigate: function navigate(fragment, options) {
-    _history2['default'].navigate(fragment, options);
+    this.history.navigate(fragment, options);
     return this;
   }
 

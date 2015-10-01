@@ -1,8 +1,9 @@
 //https://github.com/WebReflection/dom4
 /* jshint loopfunc: true, noempty: false*/
 // http://www.w3.org/TR/dom/#element
-
 'use strict';
+
+var _global = require('global');
 
 var property;
 var TemporaryPrototype;
@@ -15,12 +16,12 @@ var splice = ArrayPrototype.splice;
 var join = ArrayPrototype.join;
 var push = ArrayPrototype.push;
 var defineProperty = Object.defineProperty;
-var document = window.document;
-var DocumentFragment = window.DocumentFragment;
-var NodePrototype = window.Node.prototype;
-var ElementPrototype = window.Element.prototype;
-var ShadowRoot = window.ShadowRoot;
-var SVGElement = window.SVGElement;
+var document = _global.window.document;
+var DocumentFragment = _global.window.DocumentFragment;
+var NodePrototype = _global.window.Node.prototype;
+var ElementPrototype = _global.window.Element.prototype;
+var ShadowRoot = _global.window.ShadowRoot;
+var SVGElement = _global.window.SVGElement;
 var classListDescriptor = {
   get: function get() {
     return new DOMTokenList(this);
@@ -192,7 +193,7 @@ if (!(CLASS_LIST in document.documentElement)) {
     TemporaryPrototype = TemporaryTokenList.constructor.prototype;
     if (!('add' in TemporaryPrototype)) {
       // ASHA double fails in here
-      TemporaryPrototype = window.TemporaryTokenList.prototype;
+      TemporaryPrototype = _global.window.TemporaryTokenList.prototype;
     }
     wrapVerifyToken = function (original) {
       return function () {
@@ -211,9 +212,9 @@ if (!(CLASS_LIST in document.documentElement)) {
 
 // requestAnimationFrame partial polyfill
 (function () {
-  for (var raf, rAF = window.requestAnimationFrame, cAF = window.cancelAnimationFrame, prefixes = ['o', 'ms', 'moz', 'webkit'], i = prefixes.length; !cAF && i--;) {
-    rAF = rAF || window[prefixes[i] + 'RequestAnimationFrame'];
-    cAF = window[prefixes[i] + 'CancelAnimationFrame'] || window[prefixes[i] + 'CancelRequestAnimationFrame'];
+  for (var raf, rAF = _global.window.requestAnimationFrame, cAF = _global.window.cancelAnimationFrame, prefixes = ['o', 'ms', 'moz', 'webkit'], i = prefixes.length; !cAF && i--;) {
+    rAF = rAF || _global.window[prefixes[i] + 'RequestAnimationFrame'];
+    cAF = _global.window[prefixes[i] + 'CancelAnimationFrame'] || _global.window[prefixes[i] + 'CancelRequestAnimationFrame'];
   }
   if (!cAF) {
     // some FF apparently implemented rAF but no cAF
@@ -240,15 +241,15 @@ if (!(CLASS_LIST in document.documentElement)) {
       };
     }
   }
-  window.requestAnimationFrame = rAF;
-  window.cancelAnimationFrame = cAF;
+  _global.window.requestAnimationFrame = rAF;
+  _global.window.cancelAnimationFrame = cAF;
 })();
 
 // http://www.w3.org/TR/dom/#customevent
 try {
-  new window.CustomEvent('?');
+  new _global.window.CustomEvent('?');
 } catch (o_O) {
-  window.CustomEvent = (function (eventName, defaultInitDict) {
+  _global.window.CustomEvent = (function (eventName, defaultInitDict) {
 
     // the infamous substitute
     function CustomEvent(type, eventInitDict) {
@@ -280,7 +281,7 @@ try {
   // is this IE9 or IE10 ?
   // where CustomEvent is there
   // but not usable as construtor ?
-  window.CustomEvent ?
+  _global.window.CustomEvent ?
   // use the CustomEvent interface in such case
   'CustomEvent' : 'Event',
   // otherwise the common compatible one

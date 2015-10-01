@@ -57,6 +57,13 @@ if (!Array.from) {
     return array;
   };
 }
+if (!Array.isArray) {
+  var op2str = Object.prototype.toString;
+  Array.isArray = function(a) {
+    return op2str.call(a) === '[object Array]';
+  }
+}
+
 
 /* string */
 if (!stringProto.includes) {

@@ -13,7 +13,7 @@ if ('localStorage' in window) {
         STORAGE.trigger({
           type: 'error',
           method: 'get',
-          data: { e: e, id: id}
+          data: {e, id}
         });
       }
       return value;
@@ -25,7 +25,7 @@ if ('localStorage' in window) {
         STORAGE.trigger({
           type: 'error',
           method: 'set',
-          data: { e: e, id: id, value: value}
+          data: { e, id, value}
         });
       }
     },
@@ -36,7 +36,7 @@ if ('localStorage' in window) {
         STORAGE.trigger({
           type: 'error',
           method: 'remove',
-          data: { e: e, id: id}
+          data: { e, id}
         });
       }
     }

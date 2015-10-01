@@ -79,7 +79,7 @@ Object.defineProperties(NLp, props);
 Object.defineProperties(HCp, props);
 
 function on(el, name, callback, context) {
-  if (_utils.isNode(this) || _utils.isString(el) && this === W) {
+  if (_utils.isNode(this) || (_utils.isString(el) || _utils.isObject(el) && this === W)) {
     context = callback;
     callback = name;
     name = el;
@@ -844,6 +844,8 @@ exports.text = text;
 exports.html = html;
 exports.throttle = throttle;
 exports.debounce = debounce;
+exports.encode = encode;
+exports.strip_tags = strip_tags;
 
 var _global = require('global');
 
@@ -939,7 +941,7 @@ var now = Date.now ? Date.now : function () {
 exports.now = now;
 
 function rand() {
-  return (Math.random() * 1e17).toString(36);
+  return (Math.random() * 1e17).toString(36).replace('.', '');
 }
 
 function result(object, key) {
@@ -1482,6 +1484,19 @@ function debounce(func, delay) {
     clearTimeout(timeout);
     timeout = setTimeout(func, delay);
   };
+}
+
+function encode(str) {
+  return encodeURIComponent(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
+}
+
+var stripTagsRegExp;
+
+function strip_tags(str) {
+  if (typeof stripTagsRegExp === undefined) {
+    stripTagsRegExp = /<\/?[^>]+>/gi;
+  }
+  return str.replace(stripTagsRegExp, '');
 }
 
 /*[ //EC5

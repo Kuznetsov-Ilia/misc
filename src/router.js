@@ -16,6 +16,7 @@ function Router(options) {
   if (options.routes) {
     this.routes = options.routes;
   }
+  this.history = HISTORY;
   bindRoutes(this);
   if (isFunction(this.init)) {
     this.init(options);
@@ -41,12 +42,12 @@ Object.assign(Eventable(Router.prototype), {
       callback = this[name];
     }
     var router = this;
-    HISTORY.route(route, function (fragment) {
+    this.history.route(route, function (fragment) {
       var args = extractParameters(route, fragment);
       if (router.execute(callback, args, name) !== false) {
-        router.trigger.apply(router, ['route:' + name].concat(args));
+        //router.trigger.apply(router, ['route:' + name].concat(args));
         router.trigger('route', name, args);
-        HISTORY.trigger('route', router, name, args);
+        //HISTORY.trigger('route', router, name, args);
       }
     });
     return this;
@@ -62,7 +63,7 @@ Object.assign(Eventable(Router.prototype), {
 
   // Simple proxy to `HISTORY` to save a fragment into the history.
   navigate (fragment, options) {
-    HISTORY.navigate(fragment, options);
+    this.history.navigate(fragment, options);
     return this;
   }
 
@@ -89,9 +90,7 @@ function routeToRegExp (route) {
   route = route
     .replace(escapeRegExp, '\\$&')
     .replace(optionalParam, '(?:$1)?')
-    .replace(namedParam, function (match, optional) {
-      return optional ? match : '([^/?]+)';
-    })
+    .replace(namedParam, (match, optional) => optional ? match : '([^/?]+)')
     .replace(splatParam, '([^?]*?)');
   return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$');
 }
