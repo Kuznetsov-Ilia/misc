@@ -69,7 +69,7 @@ var FixedSticky = {
         skipSettingToFixed,
         elTop,
         elBottom,
-        _parent = _utils.parent(el),
+        _parent = el.parent(),
         parentOffset = _utils.offset(_parent).top,
         parentHeight = _utils.outerHeight(_parent),
         cloneDummy = '<div class="#" style="height:#px"></div>'.replace('#', FixedSticky.classes.clone).replace('#', height);

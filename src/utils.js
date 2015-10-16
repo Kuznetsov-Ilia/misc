@@ -21,24 +21,20 @@ export function isEmpty(obj) {
 export function isFunction(value) {
   return typeof value === 'function';
 }
-export function contains(where, value) {
-  if (isArray(this) || isString(this)) {
-    value = where;
-    where = this;
-  }
-  return where.indexOf(value) !== -1;
-}
 export function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
-
 export function isNode(value) {
   return value instanceof window.Node;
 }
-
+if (!Array.isArray) {
+  var op2str = Object.prototype.toString;
+  Array.isArray = function(a) {
+    return op2str.call(a) === '[object Array]';
+  };
+}
 export function isArray(value) {
-  return Array.isArray(value);
-  //return isset(value) && value instanceof Array;
+  return Array.isArray(value);//return isset(value) && value instanceof Array;
 }
 export function isString(value) {
   return isset(value) && typeof value === 'string';
@@ -47,7 +43,7 @@ export function isNumber(value) {
   return isset(value) && typeof value === 'number';
 }
 export function isUndefined(value) {
-  return typeof value === 'undefined';
+  return typeof value === undefined;
 }
 export function isset(value) {
   return value !== undefined;
@@ -131,6 +127,13 @@ export function pick(input, _keys) {
   return output;
 }
 export function noop() {}
+export function contains(where, value) {
+  if (isArray(this) || isString(this)) {
+    value = where;
+    where = this;
+  }
+  return where.indexOf(value) !== -1;
+}
 export function clone(value) {
   if (isNode(value)) {
     return value.cloneNode(true);
@@ -142,12 +145,13 @@ export function clone(value) {
 }
 export function keys(o) {
   if (isObject(o)) {
-    return Object.keys(o);
+    return Object.keys(o) || [];
   }
   return [];
 }
 export function outerHeight(el, withMargins) {
   if (isNode(this)) {
+    withMargins = el;
     el = this;
   }
   if (el) {
@@ -601,3 +605,30 @@ export function strip_tags(str) {
   }
   return str.replace(stripTagsRegExp, '');
 }
+
+var NodeMethods = {
+  outerHeight, outerWidth, offset, height, width,
+  position,
+  parent,
+  siblings,
+  prev,
+  next,
+  first,
+  after,
+  before,
+  append,
+  prepend,
+  replaceWith,
+  css,
+  data,
+  attr,
+  text,
+  html
+};
+
+var props = Object.keys(NodeMethods).reduce((acc, key) => {
+  acc[key] = {value: NodeMethods[key]};
+  return acc;
+}, {});
+Object.defineProperties(window.Node.prototype, props);
+

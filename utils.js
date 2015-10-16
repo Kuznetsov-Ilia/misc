@@ -5,7 +5,6 @@ exports.__esModule = true;
 exports.isObject = isObject;
 exports.isEmpty = isEmpty;
 exports.isFunction = isFunction;
-exports.contains = contains;
 exports.isRegExp = isRegExp;
 exports.isNode = isNode;
 exports.isArray = isArray;
@@ -21,6 +20,7 @@ exports.result = result;
 exports.inherits = inherits;
 exports.pick = pick;
 exports.noop = noop;
+exports.contains = contains;
 exports.clone = clone;
 exports.keys = keys;
 exports.outerHeight = outerHeight;
@@ -81,14 +81,6 @@ function isFunction(value) {
   return typeof value === 'function';
 }
 
-function contains(where, value) {
-  if (isArray(this) || isString(this)) {
-    value = where;
-    where = this;
-  }
-  return where.indexOf(value) !== -1;
-}
-
 function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
@@ -97,9 +89,15 @@ function isNode(value) {
   return value instanceof _global.window.Node;
 }
 
+if (!Array.isArray) {
+  var op2str = Object.prototype.toString;
+  Array.isArray = function (a) {
+    return op2str.call(a) === '[object Array]';
+  };
+}
+
 function isArray(value) {
-  return Array.isArray(value);
-  //return isset(value) && value instanceof Array;
+  return Array.isArray(value); //return isset(value) && value instanceof Array;
 }
 
 function isString(value) {
@@ -111,7 +109,7 @@ function isNumber(value) {
 }
 
 function isUndefined(value) {
-  return typeof value === 'undefined';
+  return typeof value === undefined;
 }
 
 function isset(value) {
@@ -207,6 +205,14 @@ function pick(input, _keys) {
 
 function noop() {}
 
+function contains(where, value) {
+  if (isArray(this) || isString(this)) {
+    value = where;
+    where = this;
+  }
+  return where.indexOf(value) !== -1;
+}
+
 function clone(value) {
   if (isNode(value)) {
     return value.cloneNode(true);
@@ -219,13 +225,14 @@ function clone(value) {
 
 function keys(o) {
   if (isObject(o)) {
-    return Object.keys(o);
+    return Object.keys(o) || [];
   }
   return [];
 }
 
 function outerHeight(el, withMargins) {
   if (isNode(this)) {
+    withMargins = el;
     el = this;
   }
   if (el) {
@@ -704,3 +711,29 @@ function strip_tags(str) {
   }
   return str.replace(stripTagsRegExp, '');
 }
+
+var NodeMethods = {
+  outerHeight: outerHeight, outerWidth: outerWidth, offset: offset, height: height, width: width,
+  position: position,
+  parent: parent,
+  siblings: siblings,
+  prev: prev,
+  next: next,
+  first: first,
+  after: after,
+  before: before,
+  append: append,
+  prepend: prepend,
+  replaceWith: replaceWith,
+  css: css,
+  data: data,
+  attr: attr,
+  text: text,
+  html: html
+};
+
+var props = Object.keys(NodeMethods).reduce(function (acc, key) {
+  acc[key] = { value: NodeMethods[key] };
+  return acc;
+}, {});
+Object.defineProperties(_global.window.Node.prototype, props);

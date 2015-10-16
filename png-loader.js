@@ -4,8 +4,8 @@ var promise = require('./Promise');
 var coordsPromise = promise();
 var FILELIST = [];
 var PITCHPASSED = false;
-var webRoot = '.';
-var webPath = '/dev/images/sprite.png';
+var webRoot = './dev';
+var webPath = '/images/sprite.png';
 module.exports = function (source) {
   this.cacheable();
   var callback = this.async();

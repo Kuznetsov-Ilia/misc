@@ -113,11 +113,10 @@ var properties = {
 };
 
 var props = Object.keys(properties).reduce((acc, name) => {
-  acc[name] = {
-    value: properties[name]
-  };
+  acc[name] = { value: properties[name] };
   return acc;
 }, {});
+
 Object.defineProperties(NodePrototype, props);
 
 // bring query and queryAll to the document too

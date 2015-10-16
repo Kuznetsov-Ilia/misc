@@ -58,6 +58,13 @@
       "babelify"
     ]
   },
+  "browser": {
+    "global/document": "./node_modules/global/dist/bro.js",
+    "global/body": "./node_modules/global/dist/bro.js",
+    "global/window": "./node_modules/global/dist/bro.js",
+    "global/html": "./node_modules/global/dist/bro.js",
+    "global": "./node_modules/global/dist/bro.js"
+  },
   "devDependencies": {
     "global": "git+https://github.com/QiV/global.git#master",
     "spritesmith": "^1.3.2"

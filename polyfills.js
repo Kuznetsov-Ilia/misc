@@ -1,13 +1,5 @@
 'use strict';
 
-window.$ = function () {
-  return {
-    css: function css() {
-      // hello EGOR!
-    }
-  };
-};
-
 var arrayProto = Array.prototype;
 var stringProto = String.prototype;
 var arrayProps = {};
@@ -20,7 +12,7 @@ Object.assign = Object.assign || extend;
 if (!arrayProto.find) {
   arrayProps.find = {
     value: function value(predicate) {
-      if (this == null) {
+      if (this === null) {
         throw new TypeError('Array.prototype.find called on null or undefined');
       }
       if (typeof predicate !== 'function') {
@@ -59,12 +51,12 @@ if (!Array.from) {
     return array;
   };
 }
-if (!Array.isArray) {
+/*if (!Array.isArray) {
   var op2str = Object.prototype.toString;
-  Array.isArray = function (a) {
+  Array.isArray = function(a) {
     return op2str.call(a) === '[object Array]';
   };
-}
+}*/
 
 /* string */
 if (!stringProto.includes) {
@@ -101,17 +93,17 @@ Object.defineProperties(stringProto, stringProps);
 /* number */
 if (!Number.isFinite) {
   Number.isFinite = function (value) {
-    return 'number' == typeof value && isFinite(value);
+    return typeof value === 'number' && isFinite(value);
   };
 }
 if (!Number.isInteger) {
   Number.isInteger = function (value) {
-    return 'number' == typeof value && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) == value;
+    return typeof value === 'number' && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) === value;
   };
 }
 if (!Number.isNaN) {
   Number.isNaN = function (value) {
-    return 'number' == typeof value && isNaN(value);
+    return typeof value === 'number' && isNaN(value);
   };
 }
 if (!Number.parseInt) {

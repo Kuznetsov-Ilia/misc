@@ -6,8 +6,12 @@ var UID = 0;
 
 function View (options={}) {
   this.cid = UID++;
+  this.garbage = [];
   if (isFunction(options.stopPreloader)){
     this.stopPreloader = options.stopPreloader;
+  }
+  if (options.template) {
+    this.template = options.template;
   }
   if (this.init !== noop) {
     this.init(options);
@@ -44,6 +48,14 @@ Object.assign(Eventable(View.prototype), {
   willRender: noop,//executed both after init and after willUpdate*
   didRender: noop,//executed both after didInsertElement and didUpdate*
   // *These hooks can be used in cases where the setup for initial render and subsequent re-renders is idempotent instead of duplicating the logic in both places. In most cases, it is better to try to make these hooks idempotent, in keeping with the spirit of "re-render from scratch every time"
+  add (somethingToRemove) {
+    if (Array.isArray(somethingToRemove)) {
+      this.garbage = this.garbage.concat(somethingToRemove);
+    } else {
+      this.garbage.push(somethingToRemove);
+    }
+    return this;
+  },
   $ (selector) {
     return this.el.find(selector);
   },
