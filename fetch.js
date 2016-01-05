@@ -2,16 +2,11 @@
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 var _global = require('global');
 
 var _utils = require('./utils');
 
-var _Promise = require('./Promise');
-
-var _Promise2 = _interopRequireDefault(_Promise);
-
+//import Promise from './Promise';
 var DEFAULT_TIMEOUT = 5000;
 var DONE = 4;
 var fetch;
@@ -63,6 +58,7 @@ function prepare(callback) {
         break;
       case 'put':
         options.headers['Content-type'] = 'application/json';
+        options.credentials = 'include';
         if (!_utils.isEmpty(data) && !isNativeDataTypesForXHR2(data)) {
           options.body = JSON.stringify(data);
         }
@@ -85,7 +81,7 @@ function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response.json();
   } else {
-    return _Promise2['default'].reject(new Error(response.statusText));
+    return Promise.reject(new Error(response.statusText));
   }
 }
 
@@ -99,7 +95,7 @@ function oldschool(url, options) {
   if (xhr.abort) {
     abort = xhr.abort;
   }
-  return _Promise2['default'](function (resolve, reject) {
+  return Promise(function (resolve, reject) {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === DONE) {
         var status = xhr.status;
@@ -188,7 +184,7 @@ function isNativeDataTypesForXHR2(data) {
 }
 
 function jsonp(url, data, options) {
-  return _Promise2['default'](function (resolve, reject) {
+  return Promise(function (resolve, reject) {
     var script = _global.document.createElement('script');
     var _rand = '_' + _utils.rand();
     var callbackName = options && options.callbackName || 'callback';

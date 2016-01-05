@@ -38,6 +38,7 @@ if (!arrayProto.includes) {
     value: has
   };
 }
+arrayProps.matches = { value: has };
 arrayProps.contains = { value: has };
 arrayProps.has = { value: has };
 
@@ -62,6 +63,7 @@ if (!Array.from) {
 if (!stringProto.includes) {
   stringProto.includes = has;
 }
+stringProps.matches = { value: has };
 stringProps.contains = { value: has };
 stringProps.has = { value: has };
 

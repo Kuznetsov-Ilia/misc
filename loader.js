@@ -2,21 +2,16 @@
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 var _global = require('global');
 
-var _Promise = require('./Promise');
-
-var _Promise2 = _interopRequireDefault(_Promise);
-
+//import Promise from './Promise';
 //import fetch from './fetch';
 var LOADED = {};
 var head = _global.document.getElementsByTagName('head')[0] || _global.document.documentElement;
 
 exports['default'] = function (src) {
   //return fetch().
-  return new _Promise2['default'](function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (LOADED[src]) {
       resolve();
     } else {

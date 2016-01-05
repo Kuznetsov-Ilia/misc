@@ -1,6 +1,6 @@
 import {window, document, body} from 'global';
 import {isEmpty, isString, isObject, isset, rand} from './utils';
-import Promise from './Promise';
+//import Promise from './Promise';
 const DEFAULT_TIMEOUT = 5000;
 const DONE = 4;
 var fetch;
@@ -50,6 +50,7 @@ function prepare(callback) {
       break;
     case 'put':
       options.headers['Content-type'] = 'application/json';
+      options.credentials = 'include';
       if (!isEmpty(data) && !isNativeDataTypesForXHR2(data)) {
         options.body = JSON.stringify(data);
       }

@@ -9,39 +9,35 @@ var _utils = require('./utils');
 exports['default'] = View;
 
 var UID = 0;
-//var Model = require('model');
 
 function View() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
   this.cid = UID++;
   this.garbage = [];
+
   if (_utils.isFunction(options.stopPreloader)) {
     this.stopPreloader = options.stopPreloader;
   }
+  if (!options.template && !this.template) {
+    throw 'no template found, must be specified';
+  }
+
   if (options.template) {
     this.template = options.template;
   }
+  var el = _utils.isNode(options) ? options : _utils.isNode(options.el) ? options.el : false;
+  if (el) {
+    this.render(el);
+  }
+  /*if (!this.template.el) {
+  }*/
+  this.el = this.template.el;
+  this.delegateEvents();
   if (this.init !== _utils.noop) {
     this.init(options);
   }
 
-  ///this.name = options.name;
-
-  if ('Model' in options) {
-    this.model = new options.Model(options.data);
-  }
-
-  if (options.watch && this.model) {
-    var _this = this;
-    this.model.on('change:' + options.watch, function (model /*, changedAttributeValue*/) {
-      _this.render(model, model.get());
-    });
-  }
-
-  /*if (this.inited !== noop) {
-    this.inited(options);
-  }*/
   return this;
 }
 View.assign = _utils.inherits;
@@ -49,12 +45,12 @@ View.assign = _utils.inherits;
 Object.assign(_events.Eventable(View.prototype), {
   init: _utils.noop, // Set initial component state without triggering re-render
   didInsertElement: _utils.noop, //Provides opportunity for manual DOM manipulation
-  willReceiveAttrs: _utils.noop, //React to changes in component attributes, so that setState can be invoked before render
-  shouldUpdate: _utils.noop, //Gives a component an opportunity to reject downstream revalidation
-  willUpdate: _utils.noop, //Invoked before a template is re-rendered to give the component an opportunity to inspect the DOM before updates have been applied
-  didUpdate: _utils.noop, //Invoked after a template is re-rendered to give the component an opportunity to update the DOM
+  //willReceiveAttrs: noop,//React to changes in component attributes, so that setState can be invoked before render
+  //shouldUpdate: noop,//Gives a component an opportunity to reject downstream revalidation
+  //willUpdate: noop,//Invoked before a template is re-rendered to give the component an opportunity to inspect the DOM before updates have been applied
+  //didUpdate: noop,//Invoked after a template is re-rendered to give the component an opportunity to update the DOM
   willDestroyElement: _utils.noop, //The inverse of didInsertElement; clean up anything set up in that hook
-  willRender: _utils.noop, //executed both after init and after willUpdate*
+  //willRender: noop,//executed both after init and after willUpdate*
   didRender: _utils.noop, //executed both after didInsertElement and didUpdate*
   // *These hooks can be used in cases where the setup for initial render and subsequent re-renders is idempotent instead of duplicating the logic in both places. In most cases, it is better to try to make these hooks idempotent, in keeping with the spirit of "re-render from scratch every time"
   add: function add(somethingToRemove) {
@@ -71,6 +67,11 @@ Object.assign(_events.Eventable(View.prototype), {
 
   render: function render(root) {
     this.template.render(root);
+    if (this.didInsertElement !== _utils.noop) {
+      this.didInsertElement(root);
+    }
+    this.el = this.template.el;
+    this.delegateEvents();
     if (this.didRender !== _utils.noop) {
       this.didRender(root);
     }
@@ -79,13 +80,19 @@ Object.assign(_events.Eventable(View.prototype), {
   // Remove this view by taking the element out of the DOM, and removing any
   // applicable Backbone.Events listeners.
   remove: function remove() {
-    this.undelegateEvents();
-
-    var parent = this.el.parent();
+    this.el.off();
+    if (this.willDestroyElement !== _utils.noop) {
+      this.willDestroyElement();
+    }
+    if (this.template && this.template.remove) {
+      this.template.remove();
+    }
+    /*
+     var parent = this.el.parent();
     if (parent !== null) {
       parent.removeChild(this.el);
     }
-    this.off();
+    this.off();*/
 
     /*if (this.removed !== noop) {
       this.removed();
@@ -111,8 +118,10 @@ Object.assign(_events.Eventable(View.prototype), {
     var events;
     if (_utils.isset(inputEvents)) {
       events = inputEvents;
-    } else {
+    } else if (_utils.isset(this.events)) {
       events = _utils.result(this, 'events');
+    } else {
+      return this;
     }
     if (_utils.isObject(events)) {
       // we have valid map of events
@@ -131,19 +140,25 @@ Object.assign(_events.Eventable(View.prototype), {
     return this;
   },
 
+  delegateSpecialEvents: function delegateSpecialEvents() {
+    /*  if (this.e) {
+        Object.keys(this.e).map(key => {
+          var match = key.match(/\{[\w\d]+\}/gi);
+          if (match !== null) {
+            var d =  match.reduce((acc, val) => acc.replace(val, ''), key);
+          }
+          return '';
+        });
+      }*/
+  },
+
   // Clears all callbacks previously bound to the view with `delegateEvents`.
   // You usually don't need to use this, but may wish to if you have multiple
   // Backbone views attached to the same DOM element.
   undelegateEvents: function undelegateEvents() {
     this.el.off();
     return this;
-  },
-
-  _ensureElement: function _ensureElement() {
-    /*if (!isset(this.el)) {
-      this.el = $.new('div');
-    }*/
-    return this;
   }
+
 });
 module.exports = exports['default'];

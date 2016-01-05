@@ -1,6 +1,6 @@
 var LOADED = {};
 import {document} from 'global';
-import Promise from './Promise';
+//import Promise from './Promise';
 //import fetch from './fetch';
 var head = document.getElementsByTagName('head')[0] || document.documentElement;
 

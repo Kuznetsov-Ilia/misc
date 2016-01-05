@@ -21,9 +21,10 @@ function _then(promise, method, callback) {
       try {
         retVal = callback.apply(promise, args);
       } catch (err) {
-        if (DEBUG) {
+        /*if (DEBUG) {
           console.error(err);
-        }
+          throw err;
+        }*/
         promise.reject(err);
         return;
       }
@@ -43,7 +44,7 @@ function _then(promise, method, callback) {
 
     promise[method].apply(promise, args);
   };
-};
+}
 
 /**
  * «Обещания» поддерживают как [нативный](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -152,9 +153,10 @@ function Promise(executor, abort, progress) {
     try {
       executor(dfd.resolve, dfd.reject);
     } catch (err) {
-      if (DEBUG) {
+      /*if (DEBUG) {
         console.error(err);
-      }
+        throw err;
+      }*/
       dfd.reject(err);
     }
   }
@@ -202,7 +204,7 @@ function Promise(executor, abort, progress) {
       return dfd;
     };
   }
-};
+}
 
 /**
  * Дождаться «разрешения» всех обещаний
@@ -328,20 +330,24 @@ Promise.map = function (map) {
   });
 };
 
-function ttl(eventName, eventEmiter) {
+/*
+  1. абортим xhr
+  2. костылим View.prototype.add - помойка вызываемая при деструкторе вьюхи
+  3. блокируем done/fail колбеки промиса
+*/
+function ttl(eventEmiter, eventName) {
+  var _this = this;
   var XHR = this.XHR;
-  if (eventName === 'remove') {
-    eventEmiter.add([{ // View.prototype.add
-      remove: remove
-    }]);
+  if (eventName === 'remove' && XHR) {
+    eventEmiter.add([{ remove: remove }]); // View.prototype.add
   } else {
-    eventEmiter.once(eventName, remove);
-  }
-  function remove() {
-    if (XHR.status === 200) {
-      return;
+      eventEmiter.once(eventName, remove);
     }
-    XHR.abort();
+  function remove() {
+    _this.abort();
+    if (XHR.status !== 200) {
+      XHR.abort();
+    }
   }
   return this;
 }

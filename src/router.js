@@ -14,13 +14,15 @@ var escapeRegExp = /[\-{}\[\]+?.,\\\^$|#\s]/g;
 function Router(options) {
   options = options || {};
   if (options.routes) {
-    this.routes = options.routes;
+    if (!this.routes) {
+      this.routes = {};
+    }
+    Object.assign(this.routes, options.routes);
   }
-  this.history = HISTORY;
-  bindRoutes(this);
   if (isFunction(this.init)) {
     this.init(options);
   }
+  bindRoutes(this);
 }
 
 Object.assign(Eventable(Router.prototype), {
@@ -30,25 +32,24 @@ Object.assign(Eventable(Router.prototype), {
   //       ...
   //     });
   //
-  route (route, name, callback) {
+  route (route, name/*, callback*/) {
     if (!isRegExp(route)) {
       route = routeToRegExp(route);
     }
-    if (isFunction(name)) {
+    /*if (isFunction(name)) {
       callback = name;
       name = '';
     }
     if (!callback) {
       callback = this[name];
-    }
-    var router = this;
-    this.history.route(route, function (fragment) {
+    }*/
+    this.history.route(route, fragment => {
       var args = extractParameters(route, fragment);
-      if (router.execute(callback, args, name) !== false) {
-        //router.trigger.apply(router, ['route:' + name].concat(args));
-        router.trigger('route', name, args);
-        //HISTORY.trigger('route', router, name, args);
-      }
+      //if (this.execute(callback, args, name) !== false) {
+        //this.trigger.apply(this, ['route:' + name].concat(args));
+      this.trigger('route', name, args);
+        //HISTORY.trigger('route', this, name, args);
+      //}
     });
     return this;
   },
@@ -65,7 +66,9 @@ Object.assign(Eventable(Router.prototype), {
   navigate (fragment, options) {
     this.history.navigate(fragment, options);
     return this;
-  }
+  },
+
+  history: HISTORY
 
 });
 Router.assign = inherits;
