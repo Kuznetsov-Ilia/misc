@@ -147,10 +147,10 @@
     ]
   },
   "browser": {
-    "global/document": "./node_modules/global/dist/bro.js",
-    "global/body": "./node_modules/global/dist/bro.js",
-    "global/window": "./node_modules/global/dist/bro.js",
-    "global/html": "./node_modules/global/dist/bro.js",
-    "global": "./node_modules/global/dist/bro.js"
+    "global/document": "global/dist/bro.js",
+    "global/body": "global/dist/bro.js",
+    "global/window": "global/dist/bro.js",
+    "global/html": "global/dist/bro.js",
+    "global": "global/dist/bro.js"
   }
 }
