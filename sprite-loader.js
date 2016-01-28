@@ -1,6 +1,6 @@
 var spritesmith = require('spritesmith');
 var fs = require('fs');
-var Promise = require('./Promise');
+//var Promise = require('./Promise');
 var coordsPromise = {};
 var FILELIST = {};
 var timeOut;
@@ -11,8 +11,8 @@ module.exports = function (/*source*/) {
   var resource = this.resourcePath;
   var params = Object.assign({}, parseUrl(this.query), parseUrl(this.resourceQuery));
   var path = params.root + params.url;
-  coordsPromise[path] = coordsPromise[path] || Promise();
-  coordsPromise[path].done(coordinates => {
+  coordsPromise[path] = coordsPromise[path] || new Promise();
+  coordsPromise[path].then(coordinates => {
     log('done:', resource);
     if (resource in coordinates) {
       callback(null, g(coordinates[resource]));
@@ -29,9 +29,10 @@ function doSprites() {
   log('doSprites:', JSON.stringify(FILELIST).replace(/\/Users\/ikuznecov\/projects\/new\.otvet\.mail\.ru\/src/gi, '\n'));
   Object.keys(FILELIST).map(filepath => {
     log('resolving', filepath);
-    makeSprites(FILELIST[filepath], filepath)
-      .done(coordinates => coordsPromise[filepath].resolve(coordinates))
-      .fail(err => console.error('makeSprites failed!', err));
+    makeSprites(FILELIST[filepath], filepath).then(
+      coordinates => coordsPromise[filepath].resolve(coordinates),
+      err => console.error('makeSprites failed!', err)
+    );
   });
 }
 
@@ -71,7 +72,7 @@ function g(css) {
 }
 
 function makeSprites(src, path) {
-  return Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     spritesmith({src}, (err, result) => {
       if (err) {
         console.error(err);
