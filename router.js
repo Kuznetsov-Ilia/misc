@@ -1,8 +1,4 @@
-'use strict';
-
 exports.__esModule = true;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _utils = require('./utils');
 
@@ -11,6 +7,8 @@ var _history = require('./history');
 var _history2 = _interopRequireDefault(_history);
 
 var _events = require('./events');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Routers map faux-URLs to actions, and fire events when routes are
 // matched. Creating a new one sets its `routes` hash, if not set statically.
@@ -29,23 +27,24 @@ function Router(options) {
     }
     Object.assign(this.routes, options.routes);
   }
-  if (_utils.isFunction(this.init)) {
+  if ((0, _utils.isFunction)(this.init)) {
     this.init(options);
   }
   bindRoutes(this);
 }
 
-Object.assign(_events.Eventable(Router.prototype), {
+Object.assign((0, _events.Eventable)(Router.prototype), {
   // Manually bind a single named route to a callback. For example:
   //
   //     this.route('search/:query/p:num', 'search', function(query, num) {
   //       ...
   //     });
   //
+
   route: function route(_route, name /*, callback*/) {
     var _this2 = this;
 
-    if (!_utils.isRegExp(_route)) {
+    if (!(0, _utils.isRegExp)(_route)) {
       _route = routeToRegExp(_route);
     }
     /*if (isFunction(name)) {
@@ -80,7 +79,7 @@ Object.assign(_events.Eventable(Router.prototype), {
     return this;
   },
 
-  history: _history2['default']
+  history: _history2.default
 
 });
 Router.assign = _utils.inherits;
@@ -89,10 +88,10 @@ Router.assign = _utils.inherits;
 // order of the routes here to support behavior where the most general
 // routes can be defined at the bottom of the route map.
 function bindRoutes(_this) {
-  var routes = _utils.result(_this, 'routes');
-  if (_utils.isset(routes)) {
+  var routes = (0, _utils.result)(_this, 'routes');
+  if ((0, _utils.isset)(routes)) {
     var route;
-    var routeKeys = _utils.keys(routes);
+    var routeKeys = (0, _utils.keys)(routes);
     while ((route = routeKeys.pop()) !== undefined) {
       _this.route(route, routes[route]);
     }
@@ -113,12 +112,11 @@ function routeToRegExp(route) {
 // treated as `null` to normalize cross-browser behavior.
 function extractParameters(route, fragment) {
   return route.exec(fragment).slice(1).map(function (param, i) {
-    if (_utils.isArray(param) && param.length === i + 1) {
+    if ((0, _utils.isArray)(param) && param.length === i + 1) {
       // Don't decode the search params.
       return param || null;
     }
     return param ? decodeURIComponent(param) : null;
   });
 }
-exports['default'] = Router;
-module.exports = exports['default'];
+exports.default = Router;

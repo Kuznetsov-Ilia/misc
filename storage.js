@@ -1,18 +1,16 @@
-'use strict';
-
 exports.__esModule = true;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _global = require('global');
 
 var _global2 = _interopRequireDefault(_global);
 
-var _miscEvents = require('misc/events');
+var _events = require('misc/events');
 
-var STORAGE = _miscEvents.Eventable({});
-if ('localStorage' in _global2['default']) {
-  var localStorage = _global2['default'].localStorage;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var STORAGE = (0, _events.Eventable)({});
+if ('localStorage' in _global2.default) {
+  var localStorage = _global2.default.localStorage;
   Object.assign(STORAGE, {
     isNative: true,
     get: function get(id) {
@@ -69,5 +67,4 @@ if ('localStorage' in _global2['default']) {
     }
   });
 }
-exports['default'] = STORAGE;
-module.exports = exports['default'];
+exports.default = STORAGE;

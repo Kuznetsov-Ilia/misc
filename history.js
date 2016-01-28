@@ -1,3 +1,9 @@
+exports.__esModule = true;
+
+var _events = require('./events');
+
+var _global = require('global');
+
 // Backbone.History
 // ----------------
 
@@ -6,14 +12,6 @@
 // [onhashchange](https://developer.mozilla.org/en-US/docs/DOM/window.onhashchange)
 // and URL fragments. If the browser supports neither (old IE, natch),
 // falls back to polling.
-
-'use strict';
-
-exports.__esModule = true;
-
-var _events = require('./events');
-
-var _global = require('global');
 
 var routeStripper = /^[#\/]|\s+$/g; // Cached regex for stripping a leading hash/slash and trailing space.
 var rootStripper = /^\/+|\/+$/g; // Cached regex for stripping leading and trailing slashes.
@@ -40,12 +38,14 @@ function History() {
   }
 }
 
-Object.assign(_events.Eventable(History.prototype), {
+Object.assign((0, _events.Eventable)(History.prototype), {
   // Are we at the app root?
+
   atRoot: function atRoot() {
     var path = this.location.pathname.replace(atRootReg, '$&/');
     return path === this.root;
   },
+
   // Does the pathname match the root?
   matchRoot: function matchRoot() {
     var path = this.decodeFragment(this.location.pathname);
@@ -66,6 +66,7 @@ Object.assign(_events.Eventable(History.prototype), {
     var match = this.location.href.replace(getSearchReplaceReg, '').match(getSearchMatchReg);
     return match ? match[0] : '';
   },
+
   // Gets the true hash value. Cannot use location.hash directly due to bug
   // in Firefox where location.hash will always be decoded.
   getHash: function getHash(_window) {
@@ -300,5 +301,4 @@ Object.assign(_events.Eventable(History.prototype), {
   }
 });
 
-exports['default'] = new History();
-module.exports = exports['default'];
+exports.default = new History();

@@ -1,13 +1,11 @@
+exports.__esModule = true;
 /**
     https://gist.github.com/RubaXa/8501359
 * @author RubaXa <trash@rubaxa.org>
 * @license MIT
 */
 
-'use strict';
-
-exports.__esModule = true;
-exports['default'] = Promise;
+exports.default = Promise;
 
 function noop() {}
 
@@ -351,4 +349,3 @@ function ttl(eventEmiter, eventName) {
   }
   return this;
 }
-module.exports = exports['default'];

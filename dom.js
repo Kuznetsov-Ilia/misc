@@ -1,5 +1,3 @@
-'use strict';
-
 var _global = require('global');
 
 var _utils = require('./utils');
@@ -16,8 +14,7 @@ var CACHE_KEY = 0;
 var ES5ArrayMethods = ['join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf', //ES3
 'forEach', 'some', 'every', /*'find', 'filter',*/'map', 'reduce', 'reduceRight' //ES5
 ].reduce(function (acc, value) {
-  acc[value] = { value: Ap[value] };
-  return acc;
+  return acc[value] = { value: Ap[value] }, acc;
 }, {});
 
 var CustomMethods = {
@@ -28,9 +25,8 @@ var CustomMethods = {
   trigger: triggerAll,
   matches: matchesAll
 };
-var listMethods = _utils.keys(CustomMethods).reduce(function (acc, value) {
-  acc[value] = { value: CustomMethods[value] };
-  return acc;
+var listMethods = (0, _utils.keys)(CustomMethods).reduce(function (acc, value) {
+  return acc[value] = { value: CustomMethods[value] }, acc;
 }, ES5ArrayMethods);
 var matches = Ep.matches || Ep.matchesSelector || Ep.webkitMatchesSelector || Ep.khtmlMatchesSelector || Ep.mozMatchesSelector || Ep.msMatchesSelector || Ep.oMatchesSelector || function (selector) {
   var _this2 = this;
@@ -62,10 +58,14 @@ var NodeMethods = {
   html: html,
   matches: matches
 };
-var nodeMethods = _utils.keys(NodeMethods).reduce(function (acc, key) {
-  acc[key] = { value: NodeMethods[key] };
-  return acc;
-}, {});
+
+var NodeMethodsKeys = (0, _utils.keys)(NodeMethods);
+var reduceNodeMethods = function reduceNodeMethods(acc, key) {
+  return acc[key] = { value: NodeMethods[key] }, acc;
+};
+var nodeMethods = NodeMethodsKeys.filter(function (p) {
+  return !(p in Np);
+}).reduce(reduceNodeMethods, {});
 
 _global.document.matches = function (selector) {
   return _global.body.matches(selector);
@@ -74,10 +74,16 @@ Object.defineProperties(NLp, listMethods);
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
 if (Wp) {
-  Object.defineProperties(Wp, nodeMethods);
+  var windowMethods = NodeMethodsKeys.filter(function (p) {
+    return !(p in Wp);
+  }).reduce(reduceNodeMethods, {});
+  Object.defineProperties(Wp, windowMethods);
 }
 if (ETp) {
-  Object.defineProperties(ETp, nodeMethods);
+  var ETMethods = NodeMethodsKeys.filter(function (p) {
+    return !(p in ETp);
+  }).reduce(reduceNodeMethods, {});
+  Object.defineProperties(ETp, ETMethods);
 }
 
 function on(name, callback, context) {
@@ -85,11 +91,13 @@ function on(name, callback, context) {
   if (!el) {
     return false;
   }
-  if (_utils.isArray(name)) {
+  if ((0, _utils.isArray)(name)) {
+    // el.on(['click', 'submit'], fn, this)
     name.forEach(function (n) {
       on.call(el, n, callback, context);
     });
-  } else if (_utils.isObject(name)) {
+  } else if ((0, _utils.isObject)(name)) {
+    // el.on({click: fn1, submit: fn2})
     context = callback;
     for (var i in name) {
       on.call(el, i, name[i], context);
@@ -130,25 +138,25 @@ function off(event, fn) {
   /*    || !isset(this.handlers[eventName])
       || !this.handlers[eventName][nameSpace] || !this.handlers[eventName][nameSpace].length*/
 
-  if (!_utils.isset(el.handlers)) {
+  if (!(0, _utils.isset)(el.handlers)) {
     return el;
     /*не установлены хендлеры в принципе*/
-  } else if (_utils.isset(fn)) {
-      if (_utils.isArray(event)) {
+  } else if ((0, _utils.isset)(fn)) {
+      if ((0, _utils.isArray)(event)) {
         event.forEach(function (e) {
           el.removeEventListener(e, fn, false);
         });
       } else {
         el.removeEventListener(event, fn, false);
       }
-    } else if (_utils.isset(event)) {
-      if (_utils.isArray(event)) {
+    } else if ((0, _utils.isset)(event)) {
+      if ((0, _utils.isArray)(event)) {
         event.forEach(function (e) {
           var _e$split = e.split('.');
 
           var eventName = _e$split[0];
-          var _e$split$1 = _e$split[1];
-          var nameSpace = _e$split$1 === undefined ? 'default' : _e$split$1;
+          var _e$split$ = _e$split[1];
+          var nameSpace = _e$split$ === undefined ? 'default' : _e$split$;
 
           el.handlers[eventName][nameSpace].forEach(function (handler, i) {
             el.removeEventListener(eventName, handler, false);
@@ -159,8 +167,8 @@ function off(event, fn) {
         var _event$split = event.split('.');
 
         var eventName = _event$split[0];
-        var _event$split$1 = _event$split[1];
-        var nameSpace = _event$split$1 === undefined ? 'default' : _event$split$1;
+        var _event$split$ = _event$split[1];
+        var nameSpace = _event$split$ === undefined ? 'default' : _event$split$;
 
         el.handlers[eventName][nameSpace].forEach(function (handler, i) {
           el.removeEventListener(eventName, handler, false);
@@ -168,8 +176,8 @@ function off(event, fn) {
         });
       }
     } else {
-      _utils.keys(el.handlers).forEach(function (eventName2) {
-        _utils.keys(el.handlers[eventName2]).forEach(function (nameSpace2) {
+      (0, _utils.keys)(el.handlers).forEach(function (eventName2) {
+        (0, _utils.keys)(el.handlers[eventName2]).forEach(function (nameSpace2) {
           el.handlers[eventName2][nameSpace2].forEach(function (handler, i) {
             el.removeEventListener(eventName2, handler, false);
             delete el.handlers[eventName2][nameSpace2][i];
@@ -180,7 +188,7 @@ function off(event, fn) {
   return el;
 }
 function find(selector, flag) {
-  if (_utils.isFunction(selector)) {
+  if ((0, _utils.isFunction)(selector)) {
     return Ap.find.call(this, selector);
   } else {
     if (flag) {
@@ -355,7 +363,7 @@ function offset() {
   };
 }
 function height(value) {
-  if (_utils.isset(value)) {
+  if ((0, _utils.isset)(value)) {
     value = parseInt(value);
     this.style.height = value + 'px';
     return value;
@@ -364,7 +372,7 @@ function height(value) {
   }
 }
 function width(value) {
-  if (_utils.isset(value)) {
+  if ((0, _utils.isset)(value)) {
     value = parseInt(value);
     this.style.width = value + 'px';
     return value;
@@ -383,14 +391,14 @@ function parent(_filter) {
   if (!el) {
     return false;
   }
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _filterFn;
-    if (_utils.isNumber(_filter)) {
-      _filterFn = function (node, k) {
+    if ((0, _utils.isNumber)(_filter)) {
+      _filterFn = function _filterFn(node, k) {
         return k === _filter;
       };
     } else {
-      _filterFn = function (node) {
+      _filterFn = function _filterFn(node) {
         return node.matches(_filter);
       };
     }
@@ -409,14 +417,14 @@ function parent(_filter) {
   }
 }
 function parentAll(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _filterFn;
-    if (_utils.isNumber(_filter)) {
-      _filterFn = function (node, iii) {
+    if ((0, _utils.isNumber)(_filter)) {
+      _filterFn = function _filterFn(node, iii) {
         return iii === _filter;
       };
     } else {
-      _filterFn = function (node) {
+      _filterFn = function _filterFn(node) {
         return node.matches(_filter);
       };
     }
@@ -444,14 +452,14 @@ function siblings(_filter) {
   var _this = this;
   return this.parent().children.filter(function (child) {
     var valid = child !== _this;
-    if (valid && _utils.isset(_filter)) {
+    if (valid && (0, _utils.isset)(_filter)) {
       valid = child.matches(_filter);
     }
     return valid;
   });
 }
 function prev(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _prev = this;
     //var result = [];
     while (_prev = _prev.previousElementSibling) {
@@ -465,7 +473,7 @@ function prev(_filter) {
   }
 }
 function prevAll(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _prev = this;
     var __result = [];
     while (_prev = _prev.previousElementSibling) {
@@ -484,7 +492,7 @@ function prevAll(_filter) {
   }
 }
 function next(filter) {
-  if (_utils.isset(filter)) {
+  if ((0, _utils.isset)(filter)) {
     var _next = this;
     while (_next = _next.nextElementSibling) {
       if (_next.matches(filter)) {
@@ -497,7 +505,7 @@ function next(filter) {
   }
 }
 function nextAll(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _next = this;
     var __result = [];
     while (_next = _next.nextElementSibling) {
@@ -516,9 +524,9 @@ function nextAll(_filter) {
   }
 }
 function first(filter) {
-  if (_utils.isset(filter)) {
+  if ((0, _utils.isset)(filter)) {
     var children = this.children;
-    if (_utils.isset(children) && children.length > 0) {
+    if ((0, _utils.isset)(children) && children.length > 0) {
       for (var ii = 0, l = children.length; ii < l; ii++) {
         if (children[ii].matches(filter)) {
           return children[ii];
@@ -547,10 +555,10 @@ function after(_html, _position) {
   } else {
     _position = 'afterbegin';
   }
-  if (_utils.isset(_html)) {
-    if (_utils.isString(_html)) {
+  if ((0, _utils.isset)(_html)) {
+    if ((0, _utils.isString)(_html)) {
       return el.insertAdjacentHTML(_position, _html);
-    } else if (_utils.isNode(_html)) {
+    } else if ((0, _utils.isNode)(_html)) {
       var _parent = el.parentNode;
       var _next = el.nextSibling;
       if (_next === null) {
@@ -569,26 +577,26 @@ function before(_html, _position) {
   } else {
     _position = 'beforebegin';
   }
-  if (_utils.isset(_html)) {
-    if (_utils.isString(_html)) {
+  if ((0, _utils.isset)(_html)) {
+    if ((0, _utils.isString)(_html)) {
       return this.insertAdjacentHTML(_position, _html);
-    } else if (_utils.isNode(_html)) {
+    } else if ((0, _utils.isNode)(_html)) {
       return this.parent().insertBefore(_html, this);
     }
   }
   return '';
 }
 function append(node) {
-  if (_utils.isNode(node)) {
+  if ((0, _utils.isNode)(node)) {
     return this.appendChild(node);
-  } else if (_utils.isString(node)) {
+  } else if ((0, _utils.isString)(node)) {
     return this.before(node, 1);
   }
 }
 function prepend(node) {
-  if (_utils.isNode(node)) {
+  if ((0, _utils.isNode)(node)) {
     this.parent().insertBefore(node, this.parent().firstChild);
-  } else if (_utils.isArray(node)) {
+  } else if ((0, _utils.isArray)(node)) {
     var _this = this;
     node.each(function (n) {
       _this.prepend(n);
@@ -599,9 +607,9 @@ function prepend(node) {
 function replaceWith(html) {
   var parentNode = this.parentNode;
   if (parentNode) {
-    if (_utils.isString(html)) {
+    if ((0, _utils.isString)(html)) {
       this.outerHTML = html;
-    } else if (_utils.isNode(html)) {
+    } else if ((0, _utils.isNode)(html)) {
       parentNode.replaceChild(html, this);
     } else {
       console.error('unsuported input type in replaceWith', typeof html, html);
@@ -611,13 +619,13 @@ function replaceWith(html) {
 }
 function css(ruleName, value) {
   var el = this;
-  if (_utils.isObject(ruleName)) {
+  if ((0, _utils.isObject)(ruleName)) {
     for (var ii in ruleName) {
       el.style[camelCase(ii)] = ruleName[ii];
     }
     return el;
-  } else if (_utils.isset(ruleName)) {
-    if (_utils.isset(value)) {
+  } else if ((0, _utils.isset)(ruleName)) {
+    if ((0, _utils.isset)(value)) {
       el.style[camelCase(ruleName)] = value;
       return value;
     } else {
@@ -635,12 +643,12 @@ function data(key, value) {
     CACHE[id] = Object.assign({}, el.dataset);
   }
   var cached = CACHE[id];
-  if (_utils.isObject(key)) {
+  if ((0, _utils.isObject)(key)) {
     for (var ii in key) {
       cached[ii] = key[ii];
     }
-  } else if (_utils.isset(key)) {
-    if (_utils.isset(value)) {
+  } else if ((0, _utils.isset)(key)) {
+    if ((0, _utils.isset)(value)) {
       cached[key] = value;
       return value;
     }
@@ -649,13 +657,13 @@ function data(key, value) {
   return cached;
 }
 function attr(name, value) {
-  if (_utils.isObject(name)) {
+  if ((0, _utils.isObject)(name)) {
     for (var ii in name) {
       this.setAttribute(ii, name[ii]);
     }
     return this;
-  } else if (_utils.isset(name)) {
-    if (_utils.isset(value)) {
+  } else if ((0, _utils.isset)(name)) {
+    if ((0, _utils.isset)(value)) {
       this.setAttribute(name, value);
       return this;
     } else {
@@ -665,7 +673,7 @@ function attr(name, value) {
   return '';
 }
 function text(textString) {
-  if (_utils.isset(textString)) {
+  if ((0, _utils.isset)(textString)) {
     this.textContent = textString;
     return this;
   } else {
@@ -674,7 +682,7 @@ function text(textString) {
 }
 
 function html(string) {
-  if (_utils.isset(string)) {
+  if ((0, _utils.isset)(string)) {
     this.innerHTML = string;
     var scripts = this.getElementsByTagName('script');
     if (scripts) {

@@ -1,17 +1,15 @@
-'use strict';
-
 exports.__esModule = true;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _global = require('global');
 
 var _global2 = _interopRequireDefault(_global);
 
-exports['default'] = cookie;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var encode = _global2['default'].encodeURIComponent;
-var decode = _global2['default'].decodeURIComponent;
+exports.default = cookie;
+
+var encode = _global2.default.encodeURIComponent;
+var decode = _global2.default.decodeURIComponent;
 
 function read(s) {
   if (s.indexOf('"') === 0) {
@@ -88,4 +86,3 @@ cookie.remove = function (key, options) {
   }
   return false;
 };
-module.exports = exports['default'];

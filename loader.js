@@ -1,15 +1,6 @@
-'use strict';
-
 exports.__esModule = true;
 
-var _global = require('global');
-
-//import Promise from './Promise';
-//import fetch from './fetch';
-var LOADED = {};
-var head = _global.document.getElementsByTagName('head')[0] || _global.document.documentElement;
-
-exports['default'] = function (src) {
+exports.default = function (src) {
   //return fetch().
   return new Promise(function (resolve, reject) {
     if (LOADED[src]) {
@@ -39,4 +30,10 @@ exports['default'] = function (src) {
   });
 };
 
-module.exports = exports['default'];
+var _global = require('global');
+
+var LOADED = {};
+
+//import Promise from './Promise';
+//import fetch from './fetch';
+var head = _global.document.getElementsByTagName('head')[0] || _global.document.documentElement;

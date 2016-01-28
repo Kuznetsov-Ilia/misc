@@ -6,7 +6,7 @@ var UID = 0;
 function View (options={}) {
   this.cid = UID++;
   this.garbage = [];
-  
+
   if (isFunction(options.stopPreloader)){
     this.stopPreloader = options.stopPreloader;
   }

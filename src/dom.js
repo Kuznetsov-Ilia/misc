@@ -13,10 +13,7 @@ var CACHE_KEY = 0;
 var ES5ArrayMethods = [
   'join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf',//ES3
   'forEach', 'some', 'every', /*'find', 'filter',*/ 'map', 'reduce', 'reduceRight'//ES5
-].reduce((acc, value) => {
-  acc[value] = {value: Ap[value]};
-  return acc;
-}, {});
+].reduce((acc, value) => (acc[value] = {value: Ap[value]}, acc), {});
 
 var CustomMethods = {
   on: onAll,
@@ -26,10 +23,8 @@ var CustomMethods = {
   trigger: triggerAll,
   matches: matchesAll
 };
-var listMethods = keys(CustomMethods).reduce((acc, value) => {
-  acc[value] = {value: CustomMethods[value]};
-  return acc;
-}, ES5ArrayMethods);
+var listMethods = keys(CustomMethods)
+  .reduce((acc, value) => (acc[value] = {value: CustomMethods[value]}, acc), ES5ArrayMethods);
 var matches = Ep.matches ||
   Ep.matchesSelector ||
   Ep.webkitMatchesSelector ||
@@ -63,33 +58,40 @@ var NodeMethods = {
   html,
   matches
 };
-var nodeMethods = keys(NodeMethods).reduce((acc, key) => {
-  acc[key] = {value: NodeMethods[key]};
-  return acc;
-}, {});
+
+var NodeMethodsKeys = keys(NodeMethods);
+var reduceNodeMethods = (acc, key) => (acc[key] = {value: NodeMethods[key]}, acc);
+var nodeMethods = NodeMethodsKeys
+  .filter(p => !(p in Np))
+  .reduce(reduceNodeMethods, {});
 
 document.matches = (selector) => body.matches(selector);
 Object.defineProperties(NLp, listMethods);
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
 if (Wp) {
-  Object.defineProperties(Wp, nodeMethods);
+  var windowMethods = NodeMethodsKeys
+    .filter(p => !(p in Wp))
+    .reduce(reduceNodeMethods, {});
+  Object.defineProperties(Wp, windowMethods);
 }
 if (ETp) {
-  Object.defineProperties(ETp, nodeMethods);
+  var ETMethods = NodeMethodsKeys
+    .filter(p => !(p in ETp))
+    .reduce(reduceNodeMethods, {});
+  Object.defineProperties(ETp, ETMethods);
 }
-
 
 function on(name, callback, context) {
   var el = this;
   if (!el) {
     return false;
   }
-  if (isArray(name)) {
+  if (isArray(name)) {// el.on(['click', 'submit'], fn, this)
     name.forEach(function (n) {
       on.call(el, n, callback, context);
     });
-  } else if (isObject(name)) {
+  } else if (isObject(name)) {// el.on({click: fn1, submit: fn2})
     context = callback;
     for (var i in name) {
       on.call(el, i, name[i], context);

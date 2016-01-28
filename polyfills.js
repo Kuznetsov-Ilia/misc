@@ -1,5 +1,3 @@
-'use strict';
-
 var arrayProto = Array.prototype;
 var stringProto = String.prototype;
 var arrayProps = {};

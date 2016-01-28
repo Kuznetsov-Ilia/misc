@@ -1,7 +1,5 @@
-// inherit.js https://gist.github.com/RubaXa/8857525
-'use strict';
-
 exports.__esModule = true;
+exports.now = exports.extend = undefined;
 exports.isObject = isObject;
 exports.isEmpty = isEmpty;
 exports.isFunction = isFunction;
@@ -30,14 +28,11 @@ exports.strip_tags = strip_tags;
 
 var _global = require('global');
 
-var extend = Object.assign;
-
-exports.extend = extend;
+var extend = exports.extend = Object.assign; // inherit.js https://gist.github.com/RubaXa/8857525
 
 function isObject(value) {
   return typeof value === 'object' && value !== null;
 }
-
 function isEmpty(obj) {
   if (!isObject(obj)) {
     return false;
@@ -47,74 +42,57 @@ function isEmpty(obj) {
   }
   return true;
 }
-
 function isFunction(value) {
   return typeof value === 'function';
 }
-
 function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
-
 function isNode(value) {
   return value instanceof _global.window.Node;
 }
-
 if (!Array.isArray) {
   var op2str = Object.prototype.toString;
   Array.isArray = function (a) {
     return op2str.call(a) === '[object Array]';
   };
 }
-
 function isArray(value) {
   return Array.isArray(value); //return isset(value) && value instanceof Array;
 }
-
 function isString(value) {
   return isset(value) && typeof value === 'string';
 }
-
 function isNumber(value) {
   return isset(value) && typeof value === 'number';
 }
-
 function isUndefined(value) {
   return typeof value === undefined;
 }
-
 function isset(value) {
   return value !== undefined;
 }
-
 function is(value) {
   return isset(value) && !!value;
 }
-
 function isEqual(input1, input2) {
   return input1 === input2 || JSON.stringify(input1) === JSON.stringify(input2);
 }
-
 function isFragment(node) {
   return isset(node) && node.nodeType === _global.window.Node.DOCUMENT_FRAGMENT_NODE;
 }
-
-var now = Date.now ? Date.now : function () {
+var now = exports.now = Date.now ? Date.now : function () {
   return Number(new Date());
 };
-exports.now = now;
-
 function rand() {
   return (Math.random() * 1e17).toString(36).replace('.', '');
 }
-
 function result(object, key) {
   if (isObject(object)) {
     var value = object[key];
     return isFunction(value) ? object[key]() : value;
   }
 }
-
 function inherits(protoProps, staticProps) {
   // Helper function to correctly set up the prototype chain, for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
@@ -127,7 +105,7 @@ function inherits(protoProps, staticProps) {
   if (isset(protoProps) && protoProps.hasOwnProperty('constructor')) {
     child = protoProps.constructor;
   } else {
-    child = function () {
+    child = function child() {
       return _parent.apply(this, arguments);
     };
   }
@@ -154,7 +132,6 @@ function inherits(protoProps, staticProps) {
 
   return child;
 }
-
 function pick(input, _keys) {
   /**
    * Creates a shallow clone of `object` composed of the specified properties.
@@ -173,9 +150,7 @@ function pick(input, _keys) {
   });
   return output;
 }
-
 function noop() {}
-
 function contains(where, value) {
   if (isArray(this) || isString(this)) {
     value = where;
@@ -183,7 +158,6 @@ function contains(where, value) {
   }
   return where.indexOf(value) !== -1;
 }
-
 function clone(value) {
   if (isNode(value)) {
     return value.cloneNode(true);
@@ -193,7 +167,6 @@ function clone(value) {
     return value;
   }
 }
-
 function keys(o) {
   if (isObject(o)) {
     return Object.keys(o) || [];
@@ -268,9 +241,7 @@ function debounce(func, delay) {
 function encode(str) {
   return encodeURIComponent(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
 }
-
 var stripTagsRegExp;
-
 function strip_tags(str) {
   if (typeof stripTagsRegExp === undefined) {
     stripTagsRegExp = /<\/?[^>]+>/gi;

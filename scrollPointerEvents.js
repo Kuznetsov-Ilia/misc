@@ -1,10 +1,6 @@
-'use strict';
-
 exports.__esModule = true;
 
-var _global = require('global');
-
-exports['default'] = function () {
+exports.default = function () {
   var className = arguments.length <= 0 || arguments[0] === undefined ? 'disable-hover' : arguments[0];
   var interval = arguments.length <= 1 || arguments[1] === undefined ? 200 : arguments[1];
 
@@ -23,4 +19,4 @@ exports['default'] = function () {
   }
 };
 
-module.exports = exports['default'];
+var _global = require('global');

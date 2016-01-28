@@ -2,39 +2,37 @@
   "name": "misc",
   "version": "0.0.1",
   "description": "misc",
+  "config": {
+    "ug": "-e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings"
+  },
   "scripts": {
+    "ee": "rm -rf node_modules && npm i && npm link global && npm run otvet",
+    "1": "npm link global",
     "watch": "NODE_ENV=production babel src --out-dir . --watch",
     "start": "NODE_ENV=production babel src --out-dir .",
-    
-    "otvet": "npm start && npm run polyfills && npm run lite:ug:otvet && npm run cp:otvet:dev",
+    "otvet": "npm start && npm run polyfills && npm run ug:otvet && npm run cp:otvet && npm run cp:otvet2",
     "polyfills": "browserify polyfills.js dom.js dom4.js > dist/polyfills.js",
-    
-    "ug:otvet": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -cm > dist/polyfills.min.js",
-    
-    "lite:ug:otvet": "cat dist/polyfills.js | uglifyjs -cm  > dist/polyfills.min.js",
-    
-    "cp:otvet:dev": "cp dist/polyfills.min.js /Users/ikuznecov/projects/new.otvet.mail.ru/test",
+    "ug:otvet": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
 
+    "ug:touch": "cat dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
+    "cp:touch": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/ && cp dist/polyfills.min.js* /Users/ikuznecov/projects/touch.otvet.mail.ru/app/js/",
+    "touch": "npm start && npm run polyfills && npm run ug:touch && npm run cp:touch",
+
+
+    "lite:ug:otvet": "cat dist/polyfills.js | uglifyjs -cm  > dist/polyfills.min.js",
+    "cp:otvet:dev": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapibig",
     "get:all": "npm run get:shim & npm run get:sham & npm run get:shiv",
     "get:shim": "wget -O dist/shim.js https://raw.githubusercontent.com/es-shims/es5-shim/master/es5-shim.min.js",
     "get:sham": "wget -O dist/sham.js https://raw.githubusercontent.com/es-shims/es5-shim/master/es5-sham.min.js",
     "get:shiv": "wget -O dist/shiv.js https://raw.githubusercontent.com/aFarkas/html5shiv/master/dist/html5shiv.min.js",
-
     "qcms2": "browserify polyfills.js dom.js dom4.js | uglifyjs -cm | gzip > ../qcms/frontend/build/polyfills.min.js.gz",
     "qcms": "browserify polyfills.js dom.js dom4.js | uglifyjs -cm > ../qcms/frontend/build/polyfills.min.js.gz",
-
     "up": "npm start && npm run polyfills && npm run ug",
-
-
     "ss": "npm start && npm run polyfills && npm run ug && npm run cp",
-    
-    
     "ug2": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js > dist/polyfills.min.js",
     "ug": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -cm | tee dist/polyfills.min.js | gzip > dist/polyfills.min.js.gz",
-    
     "cp:otvet": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapibig/app/js/",
     "cp:otvet2": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/app/js/",
-    
     "polyfills:touch": "npm run polyfills:touch:local & npm run polyfills:touch:virtualko",
     "polyfills:touch:local": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm > ../touch.otvet.mail.ru/app/js/polyfills.min.js",
     "polyfills:touch:virtualko": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm > /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/polyfills.min.js",
@@ -44,7 +42,7 @@
     "type": "git",
     "url": "https://github.com/QiV/misc"
   },
-  "main": "src/lib",
+  
   "keywords": [],
   "author": "killxxxvi@mail.ru",
   "license": "MIT",
@@ -52,11 +50,97 @@
     "url": "https://github.com/QiV/misc/issues"
   },
   "dependencies": {
-    "global": "git+https://github.com/QiV/global.git#master",
-    "babel": "*",
-    "babelify": "*",
-    "uglifyjs": "*"
+    "babel-cli": "*",
+    "babel-plugin-check-es2015-constants": "*",
+    "babel-plugin-transform-do-expressions": "*",
+    "babel-plugin-transform-es2015-arrow-functions": "*",
+    "babel-plugin-transform-es2015-block-scoped-functions": "*",
+    "babel-plugin-transform-es2015-block-scoping": "*",
+    "babel-plugin-transform-es2015-classes": "*",
+    "babel-plugin-transform-es2015-computed-properties": "*",
+    "babel-plugin-transform-es2015-destructuring": "*",
+    "babel-plugin-transform-es2015-for-of": "*",
+    "babel-plugin-transform-es2015-function-name": "*",
+    "babel-plugin-transform-es2015-literals": "*",
+    "babel-plugin-transform-es2015-modules-commonjs": "*",
+    "babel-plugin-transform-es2015-object-super": "*",
+    "babel-plugin-transform-es2015-parameters": "*",
+    "babel-plugin-transform-es2015-shorthand-properties": "*",
+    "babel-plugin-transform-es2015-spread": "*",
+    "babel-plugin-transform-es2015-sticky-regex": "*",
+    "babel-plugin-transform-es2015-template-literals": "*",
+    "babel-plugin-transform-es2015-typeof-symbol": "*",
+    "babel-plugin-transform-es2015-unicode-regex": "*",
+    "babel-plugin-transform-function-bind": "*",
+    "babel-plugin-transform-regenerator": "*",
+    "uglify-js": "*",
+    "spritesmith": "*",
+    "browserify": "*",
+    "babelify": "*"
   },
+  "babel": {
+    "plugins": [
+      "check-es2015-constants",
+      "transform-do-expressions",
+      "transform-function-bind",
+      "transform-regenerator",
+      "transform-es2015-arrow-functions",
+      "transform-es2015-block-scoped-functions",
+      "transform-es2015-block-scoping",
+      "transform-es2015-sticky-regex",
+      "transform-es2015-unicode-regex",
+      "transform-es2015-object-super",
+      "transform-es2015-parameters",
+      "transform-es2015-shorthand-properties",
+      "transform-es2015-function-name",
+      "transform-es2015-literals",
+      [
+        "transform-es2015-classes",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "transform-es2015-computed-properties",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "transform-es2015-destructuring",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "transform-es2015-for-of",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "transform-es2015-modules-commonjs",
+        {
+          "strict": false,
+          "loose": true
+        }
+      ],
+      [
+        "transform-es2015-spread",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "transform-es2015-template-literals",
+        {
+          "loose": true
+        }
+      ]
+    ]
+  },
+  "devDependencies": {},
+  "babelify": "*",
   "browserify": {
     "transform": [
       "babelify"
@@ -68,9 +152,5 @@
     "global/window": "./node_modules/global/dist/bro.js",
     "global/html": "./node_modules/global/dist/bro.js",
     "global": "./node_modules/global/dist/bro.js"
-  },
-  "devDependencies": {
-    "global": "git+https://github.com/QiV/global.git#master",
-    "spritesmith": "*"
   }
 }

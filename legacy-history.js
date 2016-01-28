@@ -1,3 +1,6 @@
+exports.__esModule = true;
+
+var _events = require('./events');
 
 // Backbone.History
 // ----------------
@@ -7,12 +10,6 @@
 // [onhashchange](https://developer.mozilla.org/en-US/docs/DOM/window.onhashchange)
 // and URL fragments. If the browser supports neither (old IE, natch),
 // falls back to polling.
-
-'use strict';
-
-exports.__esModule = true;
-
-var _events = require('./events');
 
 var W = window;
 
@@ -34,12 +31,14 @@ function History() {
   }
 }
 
-Object.assign(_events.Eventable(History.prototype), {
+Object.assign((0, _events.Eventable)(History.prototype), {
   // Are we at the app root?
+
   atRoot: function atRoot() {
     var path = this.location.pathname.replace(/[^\/]$/, '$&/');
     return path === this.root && !this.getSearch();
   },
+
   // In IE6, the hash fragment and search params are incorrect if the
   // fragment contains `?`.
   getSearch: function getSearch() {
@@ -272,5 +271,4 @@ Object.assign(_events.Eventable(History.prototype), {
   }
 });
 
-exports['default'] = new History();
-module.exports = exports['default'];
+exports.default = new History();

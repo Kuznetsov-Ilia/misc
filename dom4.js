@@ -1,11 +1,9 @@
-//https://github.com/WebReflection/dom4
-/* jshint loopfunc: true, noempty: false*/
-// http://www.w3.org/TR/dom/#element
-'use strict';
-
 var _global = require('global');
 
-var property;
+var property; //https://github.com/WebReflection/dom4
+/* jshint loopfunc: true, noempty: false*/
+// http://www.w3.org/TR/dom/#element
+
 var TemporaryPrototype;
 var TemporaryTokenList;
 var wrapVerifyToken;
@@ -32,11 +30,11 @@ var CLASS_LIST = 'classList';
 // most likely an IE9 only issue
 // see https://github.com/WebReflection/dom4/issues/6
 if (!_global.document.createElement('a').matches('a')) {
-  NodePrototype[property] = (function (matches) {
+  NodePrototype[property] = function (matches) {
     return function (selector) {
       return matches.call(this.parentNode ? this : createDocumentFragment().appendChild(this), selector);
     };
-  })(NodePrototype[property]);
+  }(NodePrototype[property]);
 }
 
 // used to fix both old webkit and SVG
@@ -102,7 +100,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
       // ASHA double fails in here
       TemporaryPrototype = _global.window.TemporaryTokenList.prototype;
     }
-    wrapVerifyToken = function (original) {
+    wrapVerifyToken = function wrapVerifyToken(original) {
       return function () {
         var i = 0;
         while (i < arguments.length) {
@@ -127,7 +125,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
     // some FF apparently implemented rAF but no cAF
     if (rAF) {
       raf = rAF;
-      rAF = function (callback) {
+      rAF = function rAF(callback) {
         var goOn = true;
         raf(function () {
           if (goOn) {
@@ -138,14 +136,14 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
           goOn = false;
         };
       };
-      cAF = function (id) {
+      cAF = function cAF(id) {
         id();
       };
     } else {
-      rAF = function (callback) {
+      rAF = function rAF(callback) {
         return setTimeout(callback, 15, 15);
       };
-      cAF = function (id) {
+      cAF = function cAF(id) {
         clearTimeout(id);
       };
     }
@@ -158,7 +156,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
 try {
   new _global.window.CustomEvent('?');
 } catch (o_O) {
-  _global.window.CustomEvent = (function (eventName, defaultInitDict) {
+  _global.window.CustomEvent = function (eventName, defaultInitDict) {
 
     // the infamous substitute
     function CustomEvent(type, eventInitDict) {
@@ -186,7 +184,7 @@ try {
 
     // that's it
     return CustomEvent;
-  })(
+  }(
   // is this IE9 or IE10 ?
   // where CustomEvent is there
   // but not usable as construtor ?

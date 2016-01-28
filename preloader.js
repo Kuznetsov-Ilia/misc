@@ -1,12 +1,6 @@
-'use strict';
-
 exports.__esModule = true;
 
-var _global = require('global');
-
-var i;
-
-exports['default'] = function (el, flag) {
+exports.default = function (el, flag) {
   if (el) {
     if (flag) {
       if (i === undefined) {
@@ -20,4 +14,6 @@ exports['default'] = function (el, flag) {
   }
 };
 
-module.exports = exports['default'];
+var _global = require('global');
+
+var i;

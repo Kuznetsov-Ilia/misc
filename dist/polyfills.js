@@ -19,8 +19,6 @@ exports.html = html;
 exports.process = process;
 
 },{}],2:[function(require,module,exports){
-'use strict';
-
 var _global = require('global');
 
 var _utils = require('./utils');
@@ -37,8 +35,7 @@ var CACHE_KEY = 0;
 var ES5ArrayMethods = ['join', 'split', 'concat', 'pop', 'push', 'shift', 'unshift', 'reverse', 'slice', 'splice', 'sort', 'indexOf', 'lastIndexOf', //ES3
 'forEach', 'some', 'every', /*'find', 'filter',*/'map', 'reduce', 'reduceRight' //ES5
 ].reduce(function (acc, value) {
-  acc[value] = { value: Ap[value] };
-  return acc;
+  return acc[value] = { value: Ap[value] }, acc;
 }, {});
 
 var CustomMethods = {
@@ -49,9 +46,8 @@ var CustomMethods = {
   trigger: triggerAll,
   matches: matchesAll
 };
-var listMethods = _utils.keys(CustomMethods).reduce(function (acc, value) {
-  acc[value] = { value: CustomMethods[value] };
-  return acc;
+var listMethods = (0, _utils.keys)(CustomMethods).reduce(function (acc, value) {
+  return acc[value] = { value: CustomMethods[value] }, acc;
 }, ES5ArrayMethods);
 var matches = Ep.matches || Ep.matchesSelector || Ep.webkitMatchesSelector || Ep.khtmlMatchesSelector || Ep.mozMatchesSelector || Ep.msMatchesSelector || Ep.oMatchesSelector || function (selector) {
   var _this2 = this;
@@ -83,10 +79,14 @@ var NodeMethods = {
   html: html,
   matches: matches
 };
-var nodeMethods = _utils.keys(NodeMethods).reduce(function (acc, key) {
-  acc[key] = { value: NodeMethods[key] };
-  return acc;
-}, {});
+
+var NodeMethodsKeys = (0, _utils.keys)(NodeMethods);
+var reduceNodeMethods = function reduceNodeMethods(acc, key) {
+  return acc[key] = { value: NodeMethods[key] }, acc;
+};
+var nodeMethods = NodeMethodsKeys.filter(function (p) {
+  return !(p in Np);
+}).reduce(reduceNodeMethods, {});
 
 _global.document.matches = function (selector) {
   return _global.body.matches(selector);
@@ -95,10 +95,16 @@ Object.defineProperties(NLp, listMethods);
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
 if (Wp) {
-  Object.defineProperties(Wp, nodeMethods);
+  var windowMethods = NodeMethodsKeys.filter(function (p) {
+    return !(p in Wp);
+  }).reduce(reduceNodeMethods, {});
+  Object.defineProperties(Wp, windowMethods);
 }
 if (ETp) {
-  Object.defineProperties(ETp, nodeMethods);
+  var ETMethods = NodeMethodsKeys.filter(function (p) {
+    return !(p in ETp);
+  }).reduce(reduceNodeMethods, {});
+  Object.defineProperties(ETp, ETMethods);
 }
 
 function on(name, callback, context) {
@@ -106,11 +112,13 @@ function on(name, callback, context) {
   if (!el) {
     return false;
   }
-  if (_utils.isArray(name)) {
+  if ((0, _utils.isArray)(name)) {
+    // el.on(['click', 'submit'], fn, this)
     name.forEach(function (n) {
       on.call(el, n, callback, context);
     });
-  } else if (_utils.isObject(name)) {
+  } else if ((0, _utils.isObject)(name)) {
+    // el.on({click: fn1, submit: fn2})
     context = callback;
     for (var i in name) {
       on.call(el, i, name[i], context);
@@ -118,7 +126,13 @@ function on(name, callback, context) {
   } else {
     var types = name.split(/\s+/);
     var handler = callback;
-    var eventName = types[0].split('.')[0];
+
+    var _types$0$split = types[0].split('.');
+
+    var eventName = _types$0$split[0];
+    var nameSpace = _types$0$split[1];
+
+    nameSpace = nameSpace || 'default';
 
     if (context) {
       handler = callback.bind(context);
@@ -129,10 +143,11 @@ function on(name, callback, context) {
       el.addEventListener(eventName, delegate(types[1], handler), false);
     }
     if (el.handlers === undefined) {
-      el.handlers = [];
+      el.handlers = {};
     }
-    el.handlers[name] = el.handlers[name] || [];
-    el.handlers[name].push(handler);
+    el.handlers[eventName] = el.handlers[eventName] || {};
+    el.handlers[eventName][nameSpace] = el.handlers[eventName][nameSpace] || [];
+    el.handlers[eventName][nameSpace].push(handler);
   }
   return el;
 }
@@ -141,53 +156,74 @@ function off(event, fn) {
   if (!el) {
     return false;
   }
+  /*    || !isset(this.handlers[eventName])
+      || !this.handlers[eventName][nameSpace] || !this.handlers[eventName][nameSpace].length*/
 
-  if (_utils.isset(this.handlers) || !_utils.keys(this.handlers).length) {
-    return this;
-  } else if (_utils.isset(fn)) {
-    if (_utils.isArray(event)) {
-      event.forEach(function (e) {
-        el.removeEventListener(e, fn, false);
-      });
-    } else {
-      this.removeEventListener(event, fn, false);
-    }
-  } else if (_utils.isset(event)) {
-    if (_utils.isArray(event)) {
-      event.forEach(function (e) {
-        el.handlers[e].forEach(function (handler, i) {
-          el.removeEventListener(e, handler, false);
+  if (!(0, _utils.isset)(el.handlers)) {
+    return el;
+    /*не установлены хендлеры в принципе*/
+  } else if ((0, _utils.isset)(fn)) {
+      if ((0, _utils.isArray)(event)) {
+        event.forEach(function (e) {
+          el.removeEventListener(e, fn, false);
+        });
+      } else {
+        el.removeEventListener(event, fn, false);
+      }
+    } else if ((0, _utils.isset)(event)) {
+      if ((0, _utils.isArray)(event)) {
+        event.forEach(function (e) {
+          var _e$split = e.split('.');
+
+          var eventName = _e$split[0];
+          var _e$split$ = _e$split[1];
+          var nameSpace = _e$split$ === undefined ? 'default' : _e$split$;
+
+          el.handlers[eventName][nameSpace].forEach(function (handler, i) {
+            el.removeEventListener(eventName, handler, false);
+            delete el.handlers[eventName][nameSpace][i];
+          });
+        });
+      } else {
+        var _event$split = event.split('.');
+
+        var eventName = _event$split[0];
+        var _event$split$ = _event$split[1];
+        var nameSpace = _event$split$ === undefined ? 'default' : _event$split$;
+
+        el.handlers[eventName][nameSpace].forEach(function (handler, i) {
+          el.removeEventListener(eventName, handler, false);
           delete el.handlers[i];
         });
-      });
+      }
     } else {
-      this.handlers[event].forEach(function (handler, i) {
-        el.removeEventListener(event, handler, false);
-        delete el.handlers[i];
+      (0, _utils.keys)(el.handlers).forEach(function (eventName2) {
+        (0, _utils.keys)(el.handlers[eventName2]).forEach(function (nameSpace2) {
+          el.handlers[eventName2][nameSpace2].forEach(function (handler, i) {
+            el.removeEventListener(eventName2, handler, false);
+            delete el.handlers[eventName2][nameSpace2][i];
+          });
+        });
       });
     }
-  } else {
-    _utils.keys(this.handlers).forEach(function (e) {
-      el.handlers[e].forEach(function (handler, i) {
-        el.removeEventListener(e, handler, false);
-        delete el.handlers[i];
-      });
-    });
-  }
-  return this;
+  return el;
 }
 function find(selector, flag) {
-  if (flag) {
-    switch (selector.charAt(0)) {
-      case '#':
-        return _global.document.getElementById(selector.substr(1));
-      case '.':
-        return this.getElementsByClassName(selector.substr(1))[0];
-      case /w+/gi:
-        return this.getElementsByTagName(selector);
+  if ((0, _utils.isFunction)(selector)) {
+    return Ap.find.call(this, selector);
+  } else {
+    if (flag) {
+      switch (selector.charAt(0)) {
+        case '#':
+          return _global.document.getElementById(selector.substr(1));
+        case '.':
+          return this.getElementsByClassName(selector.substr(1))[0];
+        case /w+/gi:
+          return this.getElementsByTagName(selector);
+      }
     }
+    return this.querySelector(selector || '☺');
   }
-  return this.querySelector(selector || '☺');
 }
 function filter(selector) {
   return this.querySelectorAll(selector || '☺') || [];
@@ -197,7 +233,9 @@ function filter(selector) {
 function passedThrough(event, selector, stopAt) {
   var currentNode = event.target;
   while (true) {
-    if (currentNode.matches(selector)) {
+    if (currentNode === null) {
+      return false;
+    } else if (currentNode.matches(selector)) {
       return currentNode;
     } else if (currentNode !== stopAt && currentNode !== _global.body) {
       currentNode = currentNode.parentNode;
@@ -346,7 +384,7 @@ function offset() {
   };
 }
 function height(value) {
-  if (_utils.isset(value)) {
+  if ((0, _utils.isset)(value)) {
     value = parseInt(value);
     this.style.height = value + 'px';
     return value;
@@ -355,7 +393,7 @@ function height(value) {
   }
 }
 function width(value) {
-  if (_utils.isset(value)) {
+  if ((0, _utils.isset)(value)) {
     value = parseInt(value);
     this.style.width = value + 'px';
     return value;
@@ -374,14 +412,14 @@ function parent(_filter) {
   if (!el) {
     return false;
   }
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _filterFn;
-    if (_utils.isNumber(_filter)) {
-      _filterFn = function (node, k) {
+    if ((0, _utils.isNumber)(_filter)) {
+      _filterFn = function _filterFn(node, k) {
         return k === _filter;
       };
     } else {
-      _filterFn = function (node) {
+      _filterFn = function _filterFn(node) {
         return node.matches(_filter);
       };
     }
@@ -400,14 +438,14 @@ function parent(_filter) {
   }
 }
 function parentAll(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _filterFn;
-    if (_utils.isNumber(_filter)) {
-      _filterFn = function (node, iii) {
+    if ((0, _utils.isNumber)(_filter)) {
+      _filterFn = function _filterFn(node, iii) {
         return iii === _filter;
       };
     } else {
-      _filterFn = function (node) {
+      _filterFn = function _filterFn(node) {
         return node.matches(_filter);
       };
     }
@@ -435,14 +473,14 @@ function siblings(_filter) {
   var _this = this;
   return this.parent().children.filter(function (child) {
     var valid = child !== _this;
-    if (valid && _utils.isset(_filter)) {
+    if (valid && (0, _utils.isset)(_filter)) {
       valid = child.matches(_filter);
     }
     return valid;
   });
 }
 function prev(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _prev = this;
     //var result = [];
     while (_prev = _prev.previousElementSibling) {
@@ -456,7 +494,7 @@ function prev(_filter) {
   }
 }
 function prevAll(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _prev = this;
     var __result = [];
     while (_prev = _prev.previousElementSibling) {
@@ -475,7 +513,7 @@ function prevAll(_filter) {
   }
 }
 function next(filter) {
-  if (_utils.isset(filter)) {
+  if ((0, _utils.isset)(filter)) {
     var _next = this;
     while (_next = _next.nextElementSibling) {
       if (_next.matches(filter)) {
@@ -488,7 +526,7 @@ function next(filter) {
   }
 }
 function nextAll(_filter) {
-  if (_utils.isset(_filter)) {
+  if ((0, _utils.isset)(_filter)) {
     var _next = this;
     var __result = [];
     while (_next = _next.nextElementSibling) {
@@ -507,9 +545,9 @@ function nextAll(_filter) {
   }
 }
 function first(filter) {
-  if (_utils.isset(filter)) {
+  if ((0, _utils.isset)(filter)) {
     var children = this.children;
-    if (_utils.isset(children) && children.length > 0) {
+    if ((0, _utils.isset)(children) && children.length > 0) {
       for (var ii = 0, l = children.length; ii < l; ii++) {
         if (children[ii].matches(filter)) {
           return children[ii];
@@ -538,10 +576,10 @@ function after(_html, _position) {
   } else {
     _position = 'afterbegin';
   }
-  if (_utils.isset(_html)) {
-    if (_utils.isString(_html)) {
+  if ((0, _utils.isset)(_html)) {
+    if ((0, _utils.isString)(_html)) {
       return el.insertAdjacentHTML(_position, _html);
-    } else if (_utils.isNode(_html)) {
+    } else if ((0, _utils.isNode)(_html)) {
       var _parent = el.parentNode;
       var _next = el.nextSibling;
       if (_next === null) {
@@ -560,26 +598,26 @@ function before(_html, _position) {
   } else {
     _position = 'beforebegin';
   }
-  if (_utils.isset(_html)) {
-    if (_utils.isString(_html)) {
+  if ((0, _utils.isset)(_html)) {
+    if ((0, _utils.isString)(_html)) {
       return this.insertAdjacentHTML(_position, _html);
-    } else if (_utils.isNode(_html)) {
+    } else if ((0, _utils.isNode)(_html)) {
       return this.parent().insertBefore(_html, this);
     }
   }
   return '';
 }
 function append(node) {
-  if (_utils.isNode(node)) {
+  if ((0, _utils.isNode)(node)) {
     return this.appendChild(node);
-  } else if (_utils.isString(node)) {
+  } else if ((0, _utils.isString)(node)) {
     return this.before(node, 1);
   }
 }
 function prepend(node) {
-  if (_utils.isNode(node)) {
+  if ((0, _utils.isNode)(node)) {
     this.parent().insertBefore(node, this.parent().firstChild);
-  } else if (_utils.isArray(node)) {
+  } else if ((0, _utils.isArray)(node)) {
     var _this = this;
     node.each(function (n) {
       _this.prepend(n);
@@ -590,9 +628,9 @@ function prepend(node) {
 function replaceWith(html) {
   var parentNode = this.parentNode;
   if (parentNode) {
-    if (_utils.isString(html)) {
+    if ((0, _utils.isString)(html)) {
       this.outerHTML = html;
-    } else if (_utils.isNode(html)) {
+    } else if ((0, _utils.isNode)(html)) {
       parentNode.replaceChild(html, this);
     } else {
       console.error('unsuported input type in replaceWith', typeof html, html);
@@ -602,13 +640,13 @@ function replaceWith(html) {
 }
 function css(ruleName, value) {
   var el = this;
-  if (_utils.isObject(ruleName)) {
+  if ((0, _utils.isObject)(ruleName)) {
     for (var ii in ruleName) {
       el.style[camelCase(ii)] = ruleName[ii];
     }
     return el;
-  } else if (_utils.isset(ruleName)) {
-    if (_utils.isset(value)) {
+  } else if ((0, _utils.isset)(ruleName)) {
+    if ((0, _utils.isset)(value)) {
       el.style[camelCase(ruleName)] = value;
       return value;
     } else {
@@ -626,12 +664,12 @@ function data(key, value) {
     CACHE[id] = Object.assign({}, el.dataset);
   }
   var cached = CACHE[id];
-  if (_utils.isObject(key)) {
+  if ((0, _utils.isObject)(key)) {
     for (var ii in key) {
       cached[ii] = key[ii];
     }
-  } else if (_utils.isset(key)) {
-    if (_utils.isset(value)) {
+  } else if ((0, _utils.isset)(key)) {
+    if ((0, _utils.isset)(value)) {
       cached[key] = value;
       return value;
     }
@@ -640,13 +678,13 @@ function data(key, value) {
   return cached;
 }
 function attr(name, value) {
-  if (_utils.isObject(name)) {
+  if ((0, _utils.isObject)(name)) {
     for (var ii in name) {
       this.setAttribute(ii, name[ii]);
     }
     return this;
-  } else if (_utils.isset(name)) {
-    if (_utils.isset(value)) {
+  } else if ((0, _utils.isset)(name)) {
+    if ((0, _utils.isset)(value)) {
       this.setAttribute(name, value);
       return this;
     } else {
@@ -656,7 +694,7 @@ function attr(name, value) {
   return '';
 }
 function text(textString) {
-  if (_utils.isset(textString)) {
+  if ((0, _utils.isset)(textString)) {
     this.textContent = textString;
     return this;
   } else {
@@ -665,7 +703,7 @@ function text(textString) {
 }
 
 function html(string) {
-  if (_utils.isset(string)) {
+  if ((0, _utils.isset)(string)) {
     this.innerHTML = string;
     var scripts = this.getElementsByTagName('script');
     if (scripts) {
@@ -685,14 +723,12 @@ function camelCase(string) {
 }
 
 },{"./utils":5,"global":1}],3:[function(require,module,exports){
-//https://github.com/WebReflection/dom4
-/* jshint loopfunc: true, noempty: false*/
-// http://www.w3.org/TR/dom/#element
-'use strict';
-
 var _global = require('global');
 
-var property;
+var property; //https://github.com/WebReflection/dom4
+/* jshint loopfunc: true, noempty: false*/
+// http://www.w3.org/TR/dom/#element
+
 var TemporaryPrototype;
 var TemporaryTokenList;
 var wrapVerifyToken;
@@ -719,11 +755,11 @@ var CLASS_LIST = 'classList';
 // most likely an IE9 only issue
 // see https://github.com/WebReflection/dom4/issues/6
 if (!_global.document.createElement('a').matches('a')) {
-  NodePrototype[property] = (function (matches) {
+  NodePrototype[property] = function (matches) {
     return function (selector) {
       return matches.call(this.parentNode ? this : createDocumentFragment().appendChild(this), selector);
     };
-  })(NodePrototype[property]);
+  }(NodePrototype[property]);
 }
 
 // used to fix both old webkit and SVG
@@ -789,7 +825,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
       // ASHA double fails in here
       TemporaryPrototype = _global.window.TemporaryTokenList.prototype;
     }
-    wrapVerifyToken = function (original) {
+    wrapVerifyToken = function wrapVerifyToken(original) {
       return function () {
         var i = 0;
         while (i < arguments.length) {
@@ -814,7 +850,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
     // some FF apparently implemented rAF but no cAF
     if (rAF) {
       raf = rAF;
-      rAF = function (callback) {
+      rAF = function rAF(callback) {
         var goOn = true;
         raf(function () {
           if (goOn) {
@@ -825,14 +861,14 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
           goOn = false;
         };
       };
-      cAF = function (id) {
+      cAF = function cAF(id) {
         id();
       };
     } else {
-      rAF = function (callback) {
+      rAF = function rAF(callback) {
         return setTimeout(callback, 15, 15);
       };
-      cAF = function (id) {
+      cAF = function cAF(id) {
         clearTimeout(id);
       };
     }
@@ -845,7 +881,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
 try {
   new _global.window.CustomEvent('?');
 } catch (o_O) {
-  _global.window.CustomEvent = (function (eventName, defaultInitDict) {
+  _global.window.CustomEvent = function (eventName, defaultInitDict) {
 
     // the infamous substitute
     function CustomEvent(type, eventInitDict) {
@@ -873,7 +909,7 @@ try {
 
     // that's it
     return CustomEvent;
-  })(
+  }(
   // is this IE9 or IE10 ?
   // where CustomEvent is there
   // but not usable as construtor ?
@@ -927,8 +963,6 @@ function toggle(token, force) {
 }
 
 },{"global":1}],4:[function(require,module,exports){
-'use strict';
-
 var arrayProto = Array.prototype;
 var stringProto = String.prototype;
 var arrayProps = {};
@@ -1063,10 +1097,8 @@ function extend(original, extended) {
 }
 
 },{}],5:[function(require,module,exports){
-// inherit.js https://gist.github.com/RubaXa/8857525
-'use strict';
-
 exports.__esModule = true;
+exports.now = exports.extend = undefined;
 exports.isObject = isObject;
 exports.isEmpty = isEmpty;
 exports.isFunction = isFunction;
@@ -1095,92 +1127,71 @@ exports.strip_tags = strip_tags;
 
 var _global = require('global');
 
-var extend = Object.assign;
-
-exports.extend = extend;
+var extend = exports.extend = Object.assign; // inherit.js https://gist.github.com/RubaXa/8857525
 
 function isObject(value) {
   return typeof value === 'object' && value !== null;
 }
-
 function isEmpty(obj) {
   if (!isObject(obj)) {
     return false;
   }
   for (var i in obj) {
-    return true;
-    break;
+    return false;
   }
-  return false;
+  return true;
 }
-
 function isFunction(value) {
   return typeof value === 'function';
 }
-
 function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
-
 function isNode(value) {
   return value instanceof _global.window.Node;
 }
-
 if (!Array.isArray) {
   var op2str = Object.prototype.toString;
   Array.isArray = function (a) {
     return op2str.call(a) === '[object Array]';
   };
 }
-
 function isArray(value) {
   return Array.isArray(value); //return isset(value) && value instanceof Array;
 }
-
 function isString(value) {
   return isset(value) && typeof value === 'string';
 }
-
 function isNumber(value) {
   return isset(value) && typeof value === 'number';
 }
-
 function isUndefined(value) {
   return typeof value === undefined;
 }
-
 function isset(value) {
   return value !== undefined;
 }
-
 function is(value) {
   return isset(value) && !!value;
 }
-
 function isEqual(input1, input2) {
   return input1 === input2 || JSON.stringify(input1) === JSON.stringify(input2);
 }
-
 function isFragment(node) {
   return isset(node) && node.nodeType === _global.window.Node.DOCUMENT_FRAGMENT_NODE;
 }
-
-var now = Date.now ? Date.now : function () {
+var now = exports.now = Date.now ? Date.now : function () {
   return Number(new Date());
 };
-exports.now = now;
-
 function rand() {
   return (Math.random() * 1e17).toString(36).replace('.', '');
 }
-
 function result(object, key) {
   if (isObject(object)) {
     var value = object[key];
     return isFunction(value) ? object[key]() : value;
   }
 }
-
 function inherits(protoProps, staticProps) {
   // Helper function to correctly set up the prototype chain, for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
@@ -1193,7 +1204,7 @@ function inherits(protoProps, staticProps) {
   if (isset(protoProps) && protoProps.hasOwnProperty('constructor')) {
     child = protoProps.constructor;
   } else {
-    child = function () {
+    child = function child() {
       return _parent.apply(this, arguments);
     };
   }
@@ -1220,7 +1231,6 @@ function inherits(protoProps, staticProps) {
 
   return child;
 }
-
 function pick(input, _keys) {
   /**
    * Creates a shallow clone of `object` composed of the specified properties.
@@ -1239,9 +1249,7 @@ function pick(input, _keys) {
   });
   return output;
 }
-
 function noop() {}
-
 function contains(where, value) {
   if (isArray(this) || isString(this)) {
     value = where;
@@ -1249,7 +1257,6 @@ function contains(where, value) {
   }
   return where.indexOf(value) !== -1;
 }
-
 function clone(value) {
   if (isNode(value)) {
     return value.cloneNode(true);
@@ -1259,7 +1266,6 @@ function clone(value) {
     return value;
   }
 }
-
 function keys(o) {
   if (isObject(o)) {
     return Object.keys(o) || [];
@@ -1334,9 +1340,7 @@ function debounce(func, delay) {
 function encode(str) {
   return encodeURIComponent(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
 }
-
 var stripTagsRegExp;
-
 function strip_tags(str) {
   if (typeof stripTagsRegExp === undefined) {
     stripTagsRegExp = /<\/?[^>]+>/gi;

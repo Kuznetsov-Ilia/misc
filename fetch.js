@@ -1,5 +1,3 @@
-'use strict';
-
 exports.__esModule = true;
 
 var _global = require('global');
@@ -16,7 +14,7 @@ if (_global.window.fetch) {
   fetch = prepare(oldschool);
 }
 
-exports['default'] = fetch;
+exports.default = fetch;
 
 function prepare(callback) {
   return function (method, url, data) {
@@ -38,17 +36,17 @@ function prepare(callback) {
       case 'get':
       case 'head':
       case 'delete':
-        if (_utils.isString(data)) {
+        if ((0, _utils.isString)(data)) {
           var sign = url.indexOf('?') === -1 ? '?' : '&';
           url = url + sign + data;
-        } else if (!_utils.isEmpty(data)) {
+        } else if (!(0, _utils.isEmpty)(data)) {
           url += '&' + Object.keys(data).map(encodeUrlParams(data)).join('&');
         }
         options.body = null;
         break;
       case 'post':
         options.credentials = 'include';
-        if (!_utils.isEmpty(data) && !isNativeDataTypesForXHR2(data)) {
+        if (!(0, _utils.isEmpty)(data) && !isNativeDataTypesForXHR2(data)) {
           if (options.headers['Content-type'].indexOf('json') >= 0) {
             options.body = 'json=' + JSON.stringify(data);
           } else {
@@ -59,13 +57,13 @@ function prepare(callback) {
       case 'put':
         options.headers['Content-type'] = 'application/json';
         options.credentials = 'include';
-        if (!_utils.isEmpty(data) && !isNativeDataTypesForXHR2(data)) {
+        if (!(0, _utils.isEmpty)(data) && !isNativeDataTypesForXHR2(data)) {
           options.body = JSON.stringify(data);
         }
         break;
     }
 
-    if (_utils.isset(options.charset)) {
+    if ((0, _utils.isset)(options.charset)) {
       options.headers['Accept-charset'] = options.charset;
     }
 
@@ -186,11 +184,11 @@ function isNativeDataTypesForXHR2(data) {
 function jsonp(url, data, options) {
   return Promise(function (resolve, reject) {
     var script = _global.document.createElement('script');
-    var _rand = '_' + _utils.rand();
+    var _rand = '_' + (0, _utils.rand)();
     var callbackName = options && options.callbackName || 'callback';
-    if (_utils.isString(data)) {
+    if ((0, _utils.isString)(data)) {
       data += '&' + callbackName + '=' + _rand;
-    } else if (_utils.isObject(data)) {
+    } else if ((0, _utils.isObject)(data)) {
       data[callbackName] = _rand;
       data = Object.keys(data).map(encodeUrlParams(data)).join('&');
     } else {
@@ -219,4 +217,3 @@ function encodeUrlParams(obj) {
     return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
   };
 }
-module.exports = exports['default'];

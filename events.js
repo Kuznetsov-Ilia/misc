@@ -1,13 +1,10 @@
-// TODO: https://gist.github.com/RubaXa/8662836
-
-'use strict';
-
 exports.__esModule = true;
 exports.Eventable = Eventable;
 
-var _miscUtils = require('misc/utils');
+var _utils = require('misc/utils');
 
-var slice = Array.prototype.slice;
+var slice = Array.prototype.slice; // TODO: https://gist.github.com/RubaXa/8662836
+
 var Events = {
   // Bind an event to a `callback` function. Passing `"all"` will bind
   // the callback to all events fired.
@@ -29,28 +26,18 @@ var Events = {
 
   // Bind an event to only be triggered a single time. After the first time
   // the callback is invoked, it will be removed.
-  once: (function (_once2) {
-    function once(_x, _x2, _x3) {
-      return _once2.apply(this, arguments);
-    }
-
-    once.toString = function () {
-      return _once2.toString();
-    };
-
-    return once;
-  })(function (name, callback, context) {
+  once: function once(name, callback, context) {
     if (!eventsApi(this, 'once', name, [callback, context]) || !callback) {
       return this;
     }
     var self = this;
-    var _once = once(function () {
+    var _once = _once2(function () {
       self.off(name, _once);
       callback.apply(this, arguments);
     });
     _once._callback = callback;
     return this.on(name, _once, context);
-  }),
+  },
 
   // Remove one or many callbacks. If `context` is null, removes all
   // callbacks with that function. If `callback` is null, removes all
@@ -161,10 +148,10 @@ for (var method in listenMethods) {
   };
 }
 
-function once(func) {
+function _once2(func) {
   var ran, result;
 
-  if (!_miscUtils.isFunction(func)) {
+  if (!(0, _utils.isFunction)(func)) {
     throw new TypeError();
   }
   return function () {
@@ -246,8 +233,7 @@ function triggerEvents(events, args) {
   }
 }
 
-exports['default'] = Events;
-
+exports.default = Events;
 function Eventable(target) {
   return Object.assign(target, Events);
 }

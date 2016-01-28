@@ -1,12 +1,10 @@
-'use strict';
-
 exports.__esModule = true;
 
 var _events = require('./events');
 
 var _utils = require('./utils');
 
-exports['default'] = View;
+exports.default = View;
 
 var UID = 0;
 
@@ -16,7 +14,7 @@ function View() {
   this.cid = UID++;
   this.garbage = [];
 
-  if (_utils.isFunction(options.stopPreloader)) {
+  if ((0, _utils.isFunction)(options.stopPreloader)) {
     this.stopPreloader = options.stopPreloader;
   }
   if (!options.template && !this.template) {
@@ -26,7 +24,7 @@ function View() {
   if (options.template) {
     this.template = options.template;
   }
-  var el = _utils.isNode(options) ? options : _utils.isNode(options.el) ? options.el : false;
+  var el = (0, _utils.isNode)(options) ? options : (0, _utils.isNode)(options.el) ? options.el : false;
   if (el) {
     this.render(el);
   }
@@ -42,7 +40,7 @@ function View() {
 }
 View.assign = _utils.inherits;
 
-Object.assign(_events.Eventable(View.prototype), {
+Object.assign((0, _events.Eventable)(View.prototype), {
   init: _utils.noop, // Set initial component state without triggering re-render
   didInsertElement: _utils.noop, //Provides opportunity for manual DOM manipulation
   //willReceiveAttrs: noop,//React to changes in component attributes, so that setState can be invoked before render
@@ -64,7 +62,6 @@ Object.assign(_events.Eventable(View.prototype), {
   $: function $(selector) {
     return this.el.find(selector);
   },
-
   render: function render(root) {
     this.template.render(root);
     if (this.didInsertElement !== _utils.noop) {
@@ -77,6 +74,7 @@ Object.assign(_events.Eventable(View.prototype), {
     }
     return this;
   },
+
   // Remove this view by taking the element out of the DOM, and removing any
   // applicable Backbone.Events listeners.
   remove: function remove() {
@@ -99,6 +97,7 @@ Object.assign(_events.Eventable(View.prototype), {
     }*/
     return this;
   },
+
   // Set callbacks, where `this.events` is a hash of
   //
   // *{"event selector": "callback"}*
@@ -116,21 +115,21 @@ Object.assign(_events.Eventable(View.prototype), {
   // not `change`, `submit`, and `reset` in Internet Explorer.
   delegateEvents: function delegateEvents(inputEvents) {
     var events;
-    if (_utils.isset(inputEvents)) {
+    if ((0, _utils.isset)(inputEvents)) {
       events = inputEvents;
-    } else if (_utils.isset(this.events)) {
-      events = _utils.result(this, 'events');
+    } else if ((0, _utils.isset)(this.events)) {
+      events = (0, _utils.result)(this, 'events');
     } else {
       return this;
     }
-    if (_utils.isObject(events)) {
+    if ((0, _utils.isObject)(events)) {
       // we have valid map of events
       this.undelegateEvents();
       for (var key in events) {
         var method = events[key];
-        if (!_utils.isFunction(method)) {
+        if (!(0, _utils.isFunction)(method)) {
           method = this[events[key]];
-          if (!_utils.isFunction(method)) {
+          if (!(0, _utils.isFunction)(method)) {
             continue;
           }
         }
@@ -139,7 +138,6 @@ Object.assign(_events.Eventable(View.prototype), {
     }
     return this;
   },
-
   delegateSpecialEvents: function delegateSpecialEvents() {
     /*  if (this.e) {
         Object.keys(this.e).map(key => {
@@ -159,6 +157,4 @@ Object.assign(_events.Eventable(View.prototype), {
     this.el.off();
     return this;
   }
-
 });
-module.exports = exports['default'];
