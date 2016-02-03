@@ -15,16 +15,16 @@ function _then(promise, method, callback) {
 
     /* istanbul ignore else */
     if (typeof callback === 'function') {
-      try {
+      //try {
         retVal = callback.apply(promise, args);
-      } catch (err) {
+      //} catch (err) {
         /*if (DEBUG) {
           console.error(err);
           throw err;
-        }*/
+        }
         promise.reject(err);
         return;
-      }
+      }*/
 
       if (retVal && typeof retVal.then === 'function') {
         if (retVal.done && retVal.fail) {
@@ -157,15 +157,15 @@ function Promise(executor, abort, progress) {
   // Работеам как native Promises
   /* istanbul ignore else */
   if (typeof executor === 'function') {
-    try {
+    //try {
       executor(dfd.resolve, dfd.reject);
-    } catch (err) {
+    //} catch (err) {
       /*if (DEBUG) {
         console.error(err);
         throw err;
       }*/
-      dfd.reject(err);
-    }
+      /*dfd.reject(err);
+    }*/
   }
 
   return dfd;

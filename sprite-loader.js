@@ -4,40 +4,45 @@ var fs = require('fs');
 var coordsPromise = {};
 var FILELIST = {};
 var timeOut;
-var log = () => {};//console.log;
-module.exports = function (/*source*/) {
+var log = ()=>{};//console.log;
+var dd = [];
+module.exports = function () {
   this.cacheable();
   var callback = this.async();
   var resource = this.resourcePath;
   var params = Object.assign({}, parseUrl(this.query), parseUrl(this.resourceQuery));
   var path = params.root + params.url;
-  coordsPromise[path] = coordsPromise[path] || new Promise();
-  coordsPromise[path].then(coordinates => {
-    log('done:', resource);
-    if (resource in coordinates) {
-      callback(null, g(coordinates[resource]));
-    } else {
-      throw JSON.stringify({resource, coordinates, mes: 'no resource found'});
-    }
-  });
+  if (!coordsPromise[path]) {
+    coordsPromise[path] = new Promise((resolve, reject) => {
+      dd.push(() => {
+        log('resolving', path);
+        makeSprites(FILELIST[path], path).then(resolve, reject);
+      });
+    });
+  }
+  coordsPromise[path].then(
+    coordinates => {
+      log('done:', resource);
+      if (resource in coordinates) {
+        callback(null, g(coordinates[resource]));
+      } else {
+        throw JSON.stringify({resource, coordinates, mes: 'no resource found'});
+      }
+    },
+    err => console.error('makeSprites failed!', err)
+  );
   log('setting new timeout', path);
   clearTimeout(timeOut);
-  timeOut = setTimeout(doSprites, 900);
+  timeOut = setTimeout(doAllSprites, 1000);
 };
-
-function doSprites() {
-  log('doSprites:', JSON.stringify(FILELIST).replace(/\/Users\/ikuznecov\/projects\/new\.otvet\.mail\.ru\/src/gi, '\n'));
-  Object.keys(FILELIST).map(filepath => {
-    log('resolving', filepath);
-    makeSprites(FILELIST[filepath], filepath).then(
-      coordinates => coordsPromise[filepath].resolve(coordinates),
-      err => console.error('makeSprites failed!', err)
-    );
-  });
+function doAllSprites() {
+  log('doAllSprites: ', dd.length);
+  dd.forEach(fn => fn());
 }
 
 module.exports.pitch = function (remainingRequest) {
   log('pitch');
+  this.cacheable();
   var params = Object.assign({}, parseUrl(this.query), parseUrl(this.resourceQuery));
   var filename = remainingRequest.split('?')[0];
   var path = params.root + params.url;
@@ -73,15 +78,20 @@ function g(css) {
 
 function makeSprites(src, path) {
   return new Promise((resolve, reject) => {
-    spritesmith({src}, (err, result) => {
+    //log('\n makeSprites Promise \n');
+    //log({src});
+    spritesmith.run({src}, (err, result) => {
+      //log('\n!spritesmith!\n');
       if (err) {
-        console.error(err);
+        //log('!!!makeSprites reject \n');
         reject(err);
       } else {
         fs.writeFile(path, result.image, 'binary', errWhenWrite => {
           if (errWhenWrite) {
+            //log('!!!makeSprites errWhenWrite \n');
             reject(errWhenWrite);
           } else {
+            //log('!!!makeSprites resolve \n');
             resolve(result.coordinates, result.properties);
           }
         });

@@ -1,6 +1,6 @@
 import {window, document, body} from 'global';
 import {isEmpty, isString, isObject, isset, rand} from './utils';
-//import Promise from './Promise';
+import Promise from './Promise';
 const DEFAULT_TIMEOUT = 5000;
 const DONE = 4;
 var fetch;

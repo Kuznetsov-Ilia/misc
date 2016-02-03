@@ -13,7 +13,6 @@ function View (options={}) {
   if (!options.template && !this.template) {
     throw 'no template found, must be specified';
   }
-
   if (options.template) {
     this.template = options.template;
   }
@@ -21,14 +20,14 @@ function View (options={}) {
   if (el) {
     this.render(el);
   }
-  /*if (!this.template.el) {
-  }*/
   this.el = this.template.el;
   this.delegateEvents();
   if (this.init !== noop) {
     this.init(options);
   }
-
+  if (options.data) {
+    this.set(options.data);
+  }
   return this;
 }
 View.assign = inherits;
@@ -71,7 +70,9 @@ Object.assign(Eventable(View.prototype), {
   // Remove this view by taking the element out of the DOM, and removing any
   // applicable Backbone.Events listeners.
   remove () {
-    this.el.off();
+    if (this.el) {
+      this.el.off();
+    }
     if (this.willDestroyElement !== noop) {
       this.willDestroyElement();
     }
@@ -107,6 +108,9 @@ Object.assign(Eventable(View.prototype), {
   // This only works for delegate-able events: not `focus`, `blur`, and
   // not `change`, `submit`, and `reset` in Internet Explorer.
   delegateEvents (inputEvents) {
+    if (!this.el) {
+      return this;
+    }
     var events;
     if (isset(inputEvents)) {
       events = inputEvents;
@@ -143,11 +147,43 @@ Object.assign(Eventable(View.prototype), {
     }*/
   },
 
+  parse (values){
+    this.args = this.args || {};
+    return Object.assign(this.args, values);
+  },
   // Clears all callbacks previously bound to the view with `delegateEvents`.
   // You usually don't need to use this, but may wish to if you have multiple
   // Backbone views attached to the same DOM element.
   undelegateEvents () {
+    if (!this.el) {
+      return this;
+    }
     this.el.off();
+    return this;
+  },
+
+  set (key, value) {
+    if (key === undefined) {
+      return this;
+    }
+    this.data = this.data || {};
+    this.args = this.args || {};
+    var values = {};
+    if (typeof key === 'object') {
+      values = key;
+    } else {
+      values[key] = value;
+    }
+    var vals = this.data = this.parse(Object.assign(this.args, values));
+    if (isset(this.tKeys)) {
+      vals = this.tKeys.reduce((acc, val) => {
+        if (val in this.data) {
+          acc[val] = this.data[val];
+        }
+        return acc;
+      }, {});
+    }
+    this.template.set(vals);
     return this;
   }
 

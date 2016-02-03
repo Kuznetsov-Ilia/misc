@@ -20,7 +20,6 @@ function View() {
   if (!options.template && !this.template) {
     throw 'no template found, must be specified';
   }
-
   if (options.template) {
     this.template = options.template;
   }
@@ -28,14 +27,14 @@ function View() {
   if (el) {
     this.render(el);
   }
-  /*if (!this.template.el) {
-  }*/
   this.el = this.template.el;
   this.delegateEvents();
   if (this.init !== _utils.noop) {
     this.init(options);
   }
-
+  if (options.data) {
+    this.set(options.data);
+  }
   return this;
 }
 View.assign = _utils.inherits;
@@ -78,7 +77,9 @@ Object.assign((0, _events.Eventable)(View.prototype), {
   // Remove this view by taking the element out of the DOM, and removing any
   // applicable Backbone.Events listeners.
   remove: function remove() {
-    this.el.off();
+    if (this.el) {
+      this.el.off();
+    }
     if (this.willDestroyElement !== _utils.noop) {
       this.willDestroyElement();
     }
@@ -114,6 +115,9 @@ Object.assign((0, _events.Eventable)(View.prototype), {
   // This only works for delegate-able events: not `focus`, `blur`, and
   // not `change`, `submit`, and `reset` in Internet Explorer.
   delegateEvents: function delegateEvents(inputEvents) {
+    if (!this.el) {
+      return this;
+    }
     var events;
     if ((0, _utils.isset)(inputEvents)) {
       events = inputEvents;
@@ -149,12 +153,45 @@ Object.assign((0, _events.Eventable)(View.prototype), {
         });
       }*/
   },
+  parse: function parse(values) {
+    this.args = this.args || {};
+    return Object.assign(this.args, values);
+  },
 
   // Clears all callbacks previously bound to the view with `delegateEvents`.
   // You usually don't need to use this, but may wish to if you have multiple
   // Backbone views attached to the same DOM element.
   undelegateEvents: function undelegateEvents() {
+    if (!this.el) {
+      return this;
+    }
     this.el.off();
+    return this;
+  },
+  set: function set(key, value) {
+    var _this = this;
+
+    if (key === undefined) {
+      return this;
+    }
+    this.data = this.data || {};
+    this.args = this.args || {};
+    var values = {};
+    if (typeof key === 'object') {
+      values = key;
+    } else {
+      values[key] = value;
+    }
+    var vals = this.data = this.parse(Object.assign(this.args, values));
+    if ((0, _utils.isset)(this.tKeys)) {
+      vals = this.tKeys.reduce(function (acc, val) {
+        if (val in _this.data) {
+          acc[val] = _this.data[val];
+        }
+        return acc;
+      }, {});
+    }
+    this.template.set(vals);
     return this;
   }
 });

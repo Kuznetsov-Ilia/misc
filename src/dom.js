@@ -198,8 +198,7 @@ function passedThrough(event, selector, stopAt) {
       return currentNode;
     } else if(currentNode !== stopAt && currentNode !== body) {
       currentNode = currentNode.parentNode;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -208,9 +207,20 @@ function delegate(delegationSelector, handler) {
   return function (event) {
     var found = passedThrough(event, delegationSelector, event.currentTarget);
     if (found) {
-      // Execute the callback with the context set to the found element
-      // jQuery goes way further, it even has it's own event object
-      handler.call(found, event);
+      /*var pseudoEvent = {
+        target: found,
+        real: event
+      };
+
+
+      ['initMouseEvent', 'initUIEvent', 'initEvent', 'preventDefault', 'stopImmediatePropagation', 'stopPropagation'].reduce((acc, val) => {
+        if (val in event) {
+          acc[val] = event[val].bind(event);
+        }
+        return acc;
+      }, pseudoEvent);*/
+      event.delegated = found;
+      return handler(event);
     }
 
 
