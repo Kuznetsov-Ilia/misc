@@ -25,8 +25,8 @@ function View (options={}) {
   if (this.init !== noop) {
     this.init(options);
   }
-  if (options.data) {
-    this.set(options.data);
+  if (options.args) {
+    this.set(options.args);
   }
   return this;
 }
@@ -147,9 +147,11 @@ Object.assign(Eventable(View.prototype), {
     }*/
   },
 
-  parse (values){
+  parse (values) {
+    this.state = this.state || {};
     this.args = this.args || {};
-    return Object.assign(this.args, values);
+    this.state = Object.assign(this.args, values);
+    return this.state;
   },
   // Clears all callbacks previously bound to the view with `delegateEvents`.
   // You usually don't need to use this, but may wish to if you have multiple
@@ -166,7 +168,7 @@ Object.assign(Eventable(View.prototype), {
     if (key === undefined) {
       return this;
     }
-    this.data = this.data || {};
+    this.state = this.state || {};
     this.args = this.args || {};
     var values = {};
     if (typeof key === 'object') {
@@ -174,11 +176,11 @@ Object.assign(Eventable(View.prototype), {
     } else {
       values[key] = value;
     }
-    var vals = this.data = this.parse(Object.assign(this.args, values));
+    var vals = this.state = this.parse(Object.assign(this.args, values));
     if (isset(this.tKeys)) {
       vals = this.tKeys.reduce((acc, val) => {
-        if (val in this.data) {
-          acc[val] = this.data[val];
+        if (val in this.state) {
+          acc[val] = this.state[val];
         }
         return acc;
       }, {});

@@ -32,8 +32,8 @@ function View() {
   if (this.init !== _utils.noop) {
     this.init(options);
   }
-  if (options.data) {
-    this.set(options.data);
+  if (options.args) {
+    this.set(options.args);
   }
   return this;
 }
@@ -154,8 +154,10 @@ Object.assign((0, _events.Eventable)(View.prototype), {
       }*/
   },
   parse: function parse(values) {
+    this.state = this.state || {};
     this.args = this.args || {};
-    return Object.assign(this.args, values);
+    this.state = Object.assign(this.args, values);
+    return this.state;
   },
 
   // Clears all callbacks previously bound to the view with `delegateEvents`.
@@ -174,7 +176,7 @@ Object.assign((0, _events.Eventable)(View.prototype), {
     if (key === undefined) {
       return this;
     }
-    this.data = this.data || {};
+    this.state = this.state || {};
     this.args = this.args || {};
     var values = {};
     if (typeof key === 'object') {
@@ -182,11 +184,11 @@ Object.assign((0, _events.Eventable)(View.prototype), {
     } else {
       values[key] = value;
     }
-    var vals = this.data = this.parse(Object.assign(this.args, values));
+    var vals = this.state = this.parse(Object.assign(this.args, values));
     if ((0, _utils.isset)(this.tKeys)) {
       vals = this.tKeys.reduce(function (acc, val) {
-        if (val in _this.data) {
-          acc[val] = _this.data[val];
+        if (val in _this.state) {
+          acc[val] = _this.state[val];
         }
         return acc;
       }, {});
