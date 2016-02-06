@@ -97,10 +97,10 @@ if (!(CLASS_LIST in document.documentElement)) {
   TemporaryTokenList.add('a', 'b', 'a');
   if (TemporaryTokenList !== 'a\x20b') {
     // no other way to reach original methods in iOS 5.1
-    TemporaryPrototype = TemporaryTokenList.constructor.prototype;
-    if (!('add' in TemporaryPrototype)) {
+    TemporaryPrototype = TemporaryTokenList.constructor.prototype || TemporaryTokenList.constructor;
+    if (!('add' in TemporaryPrototype) && TemporaryTokenList.prototype) {
       // ASHA double fails in here
-      TemporaryPrototype = window.TemporaryTokenList.prototype;
+      TemporaryPrototype = TemporaryTokenList.prototype;
     }
     wrapVerifyToken = function (original) {
       return function () {

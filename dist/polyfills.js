@@ -1,22 +1,27 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-exports.__esModule = true;
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var body = document.body;
 var html = document.documentElement;
+var _console = console || { log: noop, warn: noop, debug: noop, error: noop, table: noop };
 var _window = self || window;
 var head = document.head || document.getElementsByTagName('head')[0];
 var process = {};
 exports['default'] = window;
 exports.window = _window;
+exports.console = _console;
 exports.body = body;
 exports.head = head;
-exports.console = console;
 exports.document = document;
 exports.navigator = navigator;
 exports.location = location;
 exports.html = html;
 exports.process = process;
+
+function noop() {}
 },{}],2:[function(require,module,exports){
 var _global = require('global');
 
@@ -828,10 +833,11 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
   TemporaryTokenList.add('a', 'b', 'a');
   if (TemporaryTokenList !== 'a\x20b') {
     // no other way to reach original methods in iOS 5.1
-    TemporaryPrototype = TemporaryTokenList.constructor.prototype;
+    TemporaryPrototype = TemporaryTokenList.constructor.prototype || TemporaryTokenList.constructor;
     if (!('add' in TemporaryPrototype)) {
       // ASHA double fails in here
-      TemporaryPrototype = _global.window.TemporaryTokenList.prototype;
+      console.log(TemporaryTokenList.prototype);
+      TemporaryPrototype = TemporaryTokenList.prototype;
     }
     wrapVerifyToken = function wrapVerifyToken(original) {
       return function () {
