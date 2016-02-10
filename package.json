@@ -10,6 +10,7 @@
 
     "ee": "rm -rf node_modules && npm i && npm link global && npm run otvet",
     "1": "npm link global",
+    "2": "npm start && npm run polyfills && cat dist/shim.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
     "watch": "NODE_ENV=production babel src --out-dir . --watch",
     "start": "NODE_ENV=production babel src --out-dir .",
     "otvet": "npm start && npm run polyfills && npm run ug:otvet && npm run cp:otvet && npm run cp:otvet2",

@@ -111,6 +111,21 @@ if (ETp) {
   Object.defineProperties(ETp, ETMethods);
 }
 
+if (1 /* || ie*/) {
+    Np.cloneNode = function (deep) {
+      // If the node is a text node, then re-create it rather than clone it
+      var clone = this.nodeType === 3 ? _global.document.createTextNode(this.nodeValue) : this.cloneNode(false);
+      if (deep) {
+        var child = this.firstChild;
+        while (child) {
+          clone.appendChild(child.cloneNode(true));
+          child = child.nextSibling;
+        }
+      }
+      return clone;
+    };
+  }
+
 function on(name, callback, context) {
   var el = this;
   if (!el) {
