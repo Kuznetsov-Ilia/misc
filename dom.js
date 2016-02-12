@@ -85,21 +85,23 @@ if (ETp) {
   }).reduce(reduceNodeMethods, {});
   Object.defineProperties(ETp, ETMethods);
 }
-
-if (1 /* || ie*/) {
-    Np.cloneNode = function (deep) {
-      // If the node is a text node, then re-create it rather than clone it
-      var clone = this.nodeType === 3 ? _global.document.createTextNode(this.nodeValue) : this.cloneNode(false);
-      if (deep) {
-        var child = this.firstChild;
-        while (child) {
-          clone.appendChild(child.cloneNode(true));
-          child = child.nextSibling;
-        }
+var ua = _global.navigator.userAgent;
+if (ua.indexOf('MSIE ') !== -1 || ua.indexOf('Trident/') !== -1 || ua.indexOf('Edge/') !== -1) {
+  // rewrite broken cloneNode method in IE
+  var originalCloneNode = Np.cloneNode;
+  Np.cloneNode = function (deep) {
+    // If the node is a text node, then re-create it rather than clone it
+    var clone = this.nodeType === 3 ? _global.document.createTextNode(this.nodeValue) : originalCloneNode.call(this, false);
+    if (deep) {
+      var child = this.firstChild;
+      while (child) {
+        clone.appendChild(child.cloneNode(true));
+        child = child.nextSibling;
       }
-      return clone;
-    };
-  }
+    }
+    return clone;
+  };
+}
 
 function on(name, callback, context) {
   var el = this;

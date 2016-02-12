@@ -1,4 +1,4 @@
-import {window, document, body, html as root} from 'global';
+import {window, document, body, navigator, html as root} from 'global';
 import { isArray, isObject, isset, isNumber, isString, isNode, isFunction, keys } from './utils';
 
 var Np = window.Node.prototype;
@@ -81,11 +81,13 @@ if (ETp) {
     .reduce(reduceNodeMethods, {});
   Object.defineProperties(ETp, ETMethods);
 }
-
-if (1 /* || ie*/) {
+var ua = navigator.userAgent;
+if (ua.indexOf('MSIE ') !== -1 || ua.indexOf('Trident/') !== -1 || ua.indexOf('Edge/') !== -1) {
+  // rewrite broken cloneNode method in IE
+  var originalCloneNode = Np.cloneNode;
   Np.cloneNode = function (deep) {
     // If the node is a text node, then re-create it rather than clone it
-    var clone = this.nodeType === 3 ? document.createTextNode(this.nodeValue) : this.cloneNode(false);
+    var clone = this.nodeType === 3 ? document.createTextNode(this.nodeValue) : originalCloneNode.call(this, false);
     if (deep) {
       var child = this.firstChild;
       while (child) {
