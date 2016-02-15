@@ -83,9 +83,9 @@ Object.assign((0, _events.Eventable)(View.prototype), {
     if (this.willDestroyElement !== _utils.noop) {
       this.willDestroyElement();
     }
-    if (this.template && this.template.remove) {
+    /*if (this.template && this.template.remove) {
       this.template.remove();
-    }
+    }*/
     /*
      var parent = this.el.parent();
     if (parent !== null) {

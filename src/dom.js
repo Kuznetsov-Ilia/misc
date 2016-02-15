@@ -114,6 +114,7 @@ function on(name, callback, context) {
       on.call(el, i, name[i], context);
     }
   } else {
+    //submit, focus, blur, load, unload, change, reset, scroll
     var types = name.split(/\s+/);
     var handler = callback;
     var [eventName, nameSpace] = types[0].split('.');
