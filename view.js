@@ -80,6 +80,7 @@ Object.assign((0, _events.Eventable)(View.prototype), {
     if (this.el) {
       this.el.off();
     }
+    this.off();
     if (this.willDestroyElement !== _utils.noop) {
       this.willDestroyElement();
     }

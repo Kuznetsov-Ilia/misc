@@ -73,6 +73,7 @@ Object.assign(Eventable(View.prototype), {
     if (this.el) {
       this.el.off();
     }
+    this.off();
     if (this.willDestroyElement !== noop) {
       this.willDestroyElement();
     }
