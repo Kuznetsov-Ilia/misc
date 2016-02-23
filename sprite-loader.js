@@ -33,7 +33,7 @@ module.exports = function () {
   );
   log('setting new timeout', path);
   clearTimeout(timeOut);
-  timeOut = setTimeout(doAllSprites, 1000);
+  timeOut = setTimeout(doAllSprites, 2000);
 };
 function doAllSprites() {
   log('doAllSprites: ', dd.length);
