@@ -36,7 +36,9 @@ function prepare(callback) {
       } else if (!isEmpty(data)) {
         url += '&' + Object.keys(data).map(encodeUrlParams(data)).join('&');
       }
-      options.body = null;
+      if ('body' in options) {
+        delete options.body;
+      }
       break;
     case 'post':
       options.credentials = 'include';
