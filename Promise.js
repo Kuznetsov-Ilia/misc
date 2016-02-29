@@ -7,6 +7,7 @@ exports.__esModule = true;
 
 exports.default = Promise;
 
+
 function noop() {}
 
 function _then(promise, method, callback) {

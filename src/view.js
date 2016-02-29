@@ -74,6 +74,9 @@ Object.assign(Eventable(View.prototype), {
       this.el.off();
     }
     this.off();
+    if (this.garbage.length > 0) {
+      this.garbage.map(g => g.remove());
+    }
     if (this.willDestroyElement !== noop) {
       this.willDestroyElement();
     }

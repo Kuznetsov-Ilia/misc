@@ -30,6 +30,7 @@ var _global = require('global');
 
 var extend = exports.extend = Object.assign; // inherit.js https://gist.github.com/RubaXa/8857525
 
+
 function isObject(value) {
   return typeof value === 'object' && value !== null;
 }

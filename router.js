@@ -65,6 +65,7 @@ Object.assign((0, _events.Eventable)(Router.prototype), {
     return this;
   },
 
+
   // Execute a route handler with the provided parameters.  This is an
   // excellent place to do pre-route setup or post-route cleanup.
   execute: function execute(callback, args /*, name*/) {
@@ -73,11 +74,13 @@ Object.assign((0, _events.Eventable)(Router.prototype), {
     }
   },
 
+
   // Simple proxy to `HISTORY` to save a fragment into the history.
   navigate: function navigate(fragment, options) {
     this.history.navigate(fragment, options);
     return this;
   },
+
 
   history: _history2.default
 

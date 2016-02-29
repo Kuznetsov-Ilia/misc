@@ -21,6 +21,7 @@ if (_global.window.fetch) {
 
 exports.default = fetch;
 
+
 function prepare(callback) {
   return function (method, url, data) {
     var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];

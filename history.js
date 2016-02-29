@@ -53,12 +53,14 @@ Object.assign((0, _events.Eventable)(History.prototype), {
     return root === this.root;
   },
 
+
   // Unicode characters in `location.pathname` are percent encoded so they're
   // decoded for comparison. `%25` should not be decoded since it may be part
   // of an encoded parameter.
   decodeFragment: function decodeFragment(fragment) {
     return decodeURI(fragment.replace(decodeFragmentReg, '%2525'));
   },
+
 
   // In IE6, the hash fragment and search params are incorrect if the
   // fragment contains `?`.
@@ -74,11 +76,13 @@ Object.assign((0, _events.Eventable)(History.prototype), {
     return match ? match[1] : '';
   },
 
+
   // Get the pathname and search params, without the root.
   getPath: function getPath() {
     var path = this.decodeFragment(this.location.pathname + this.getSearch()).slice(this.root.length - 1);
     return path.charAt(0) === '/' ? path.slice(1) : path;
   },
+
 
   // Get the cross-browser normalized URL fragment from the path or hash.
   getFragment: function getFragment(fragment) {
@@ -91,6 +95,7 @@ Object.assign((0, _events.Eventable)(History.prototype), {
     }
     return fragment.replace(routeStripper, '');
   },
+
 
   // Start the hash change handling, returning `true` if the current URL matches
   // an existing route, and `false` otherwise.
@@ -162,6 +167,7 @@ Object.assign((0, _events.Eventable)(History.prototype), {
     }
   },
 
+
   // Disable Backbone.history, perhaps temporarily. Not useful in a real app,
   // but possibly useful for unit testing Routers.
   stop: function stop() {
@@ -183,11 +189,13 @@ Object.assign((0, _events.Eventable)(History.prototype), {
     isHistoryStarted = false;
   },
 
+
   // Add a route to be tested when the fragment changes. Routes added later
   // may override previous routes.
   route: function route(_route, callback) {
     this.handlers.unshift({ route: _route, callback: callback });
   },
+
 
   // Checks the current URL to see if it has changed, and if it has,
   // calls `loadUrl`, normalizing across the hidden iframe.
@@ -207,6 +215,7 @@ Object.assign((0, _events.Eventable)(History.prototype), {
     this.loadUrl();
   },
 
+
   // Attempt to load the current URL fragment. If a route succeeds with a
   // match, returns `true`. If no defined routes matches the fragment,
   // returns `false`.
@@ -223,6 +232,7 @@ Object.assign((0, _events.Eventable)(History.prototype), {
       }
     });
   },
+
 
   // Save a fragment into the hash history, or replace the URL state if the
   // 'replace' option is passed. You are responsible for properly URL-encoding
@@ -287,6 +297,7 @@ Object.assign((0, _events.Eventable)(History.prototype), {
       return this.loadUrl(fragment);
     }
   },
+
 
   // Update the hash location, either replacing the current entry, or adding
   // a new one to the browser history.

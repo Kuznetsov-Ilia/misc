@@ -81,6 +81,11 @@ Object.assign((0, _events.Eventable)(View.prototype), {
       this.el.off();
     }
     this.off();
+    if (this.garbage.length > 0) {
+      this.garbage.map(function (g) {
+        return g.remove();
+      });
+    }
     if (this.willDestroyElement !== _utils.noop) {
       this.willDestroyElement();
     }

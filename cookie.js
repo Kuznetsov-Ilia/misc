@@ -8,6 +8,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = cookie;
 
+
 var encode = _global2.default.encodeURIComponent;
 var decode = _global2.default.decodeURIComponent;
 

@@ -117,17 +117,15 @@ function on(name, callback, context) {
     //submit, focus, blur, load, unload, change, reset, scroll
     var types = name.split(/\s+/);
     var handler = callback;
-    var [eventName, nameSpace] = types[0].split('.');
-    nameSpace = nameSpace || 'default';
+    var [eventName, nameSpace = 'default'] = types[0].split('.');
 
     if (context) {
       handler = callback.bind(context);
     }
-    if (types.length === 1) {
-      el.addEventListener(eventName, handler, false);
-    } else {
-      el.addEventListener(eventName, delegate(types[1], handler), false);
+    if (types.length > 1) {
+      handler = delegate(types[1], handler);
     }
+    el.addEventListener(eventName, handler, false);
     if (el.handlers === undefined) {
       el.handlers = {};
     }
@@ -146,42 +144,50 @@ function off(event, fn) {
     || !this.handlers[eventName][nameSpace] || !this.handlers[eventName][nameSpace].length*/
 
 
+    //не установлены хендлеры в принципе
   if (!isset(el.handlers)) {
     return el;
-    /*не установлены хендлеры в принципе*/
   } else if (isset(fn)) {
+    // el.off(['click.popup', 'change'], fn)
     if (isArray(event)) {
       event.forEach(function (e) {
         el.removeEventListener(e, fn, false);
       });
     } else {
+      // el.off('click.popup', fn)
       el.removeEventListener(event, fn, false);
     }
   } else if (isset(event)) {
+    //el.off(['click.popup', 'change'])
     if (isArray(event)) {
       event.forEach(function (e) {
         var [eventName, nameSpace = 'default'] = e.split('.');
         el.handlers[eventName][nameSpace].forEach(function (handler, i) {
           el.removeEventListener(eventName, handler, false);
-          delete el.handlers[eventName][nameSpace][i];
+          //delete el.handlers[eventName][nameSpace][i];
         });
+        el.handlers[eventName][nameSpace] = [];
       });
     } else {
+      // el.off(click.popup)
       var [eventName, nameSpace = 'default'] = event.split('.');
       el.handlers[eventName][nameSpace].forEach(function (handler, i) {
         el.removeEventListener(eventName, handler, false);
-        delete el.handlers[i];
+        //delete el.handlers[i];
       });
+      el.handlers[eventName][nameSpace] = [];
     }
   } else {
+    // el.off()
     keys(el.handlers).forEach(function (eventName2) {
       keys(el.handlers[eventName2]).forEach(function(nameSpace2) {
         el.handlers[eventName2][nameSpace2].forEach(function (handler, i) {
           el.removeEventListener(eventName2, handler, false);
-          delete el.handlers[eventName2][nameSpace2][i];
+          //delete el.handlers[eventName2][nameSpace2][i];
         });
       });
     });
+    el.handlers = {};
   }
   return el;
 }
