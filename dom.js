@@ -178,11 +178,12 @@ function off(event, fn) {
         var _e$split$ = _e$split[1];
         var nameSpace = _e$split$ === undefined ? 'default' : _e$split$;
 
-        el.handlers[eventName][nameSpace].forEach(function (handler, i) {
-          el.removeEventListener(eventName, handler, false);
-          //delete el.handlers[eventName][nameSpace][i];
-        });
-        el.handlers[eventName][nameSpace] = [];
+        if (eventName in el.handlers && nameSpace in el.handlers[eventName] && el.handlers[eventName][nameSpace].length > 0) {
+          el.handlers[eventName][nameSpace].forEach(function (handler) {
+            el.removeEventListener(eventName, handler, false);
+          });
+          el.handlers[eventName][nameSpace] = [];
+        }
       });
     } else {
       // el.off(click.popup)
@@ -193,19 +194,19 @@ function off(event, fn) {
       var _event$split$ = _event$split[1];
       var nameSpace = _event$split$ === undefined ? 'default' : _event$split$;
 
-      el.handlers[eventName][nameSpace].forEach(function (handler, i) {
-        el.removeEventListener(eventName, handler, false);
-        //delete el.handlers[i];
-      });
-      el.handlers[eventName][nameSpace] = [];
+      if (eventName in el.handlers && nameSpace in el.handlers[eventName] && el.handlers[eventName][nameSpace].length > 0) {
+        el.handlers[eventName][nameSpace].forEach(function (handler) {
+          el.removeEventListener(eventName, handler, false);
+        });
+        el.handlers[eventName][nameSpace] = [];
+      }
     }
   } else {
     // el.off()
     (0, _utils.keys)(el.handlers).forEach(function (eventName2) {
       (0, _utils.keys)(el.handlers[eventName2]).forEach(function (nameSpace2) {
-        el.handlers[eventName2][nameSpace2].forEach(function (handler, i) {
+        el.handlers[eventName2][nameSpace2].forEach(function (handler) {
           el.removeEventListener(eventName2, handler, false);
-          //delete el.handlers[eventName2][nameSpace2][i];
         });
       });
     });

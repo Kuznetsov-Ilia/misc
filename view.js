@@ -29,11 +29,14 @@ function View() {
   }
   this.el = this.template.el;
   this.delegateEvents();
+  if (this.template.isRendered) {
+    this.template.reset(Object.assign({}, this.defaults, options.defaults));
+    if (options.args) {
+      this.set(options.args);
+    }
+  }
   if (this.init !== _utils.noop) {
     this.init(options);
-  }
-  if (options.args) {
-    this.set(options.args);
   }
   return this;
 }

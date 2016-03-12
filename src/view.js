@@ -22,11 +22,14 @@ function View (options={}) {
   }
   this.el = this.template.el;
   this.delegateEvents();
+  if (this.template.isRendered) {
+    this.template.reset(Object.assign({}, this.defaults, options.defaults));
+    if (options.args) {
+      this.set(options.args);
+    }
+  }
   if (this.init !== noop) {
     this.init(options);
-  }
-  if (options.args) {
-    this.set(options.args);
   }
   return this;
 }

@@ -162,28 +162,35 @@ function off(event, fn) {
     if (isArray(event)) {
       event.forEach(function (e) {
         var [eventName, nameSpace = 'default'] = e.split('.');
-        el.handlers[eventName][nameSpace].forEach(function (handler, i) {
-          el.removeEventListener(eventName, handler, false);
-          //delete el.handlers[eventName][nameSpace][i];
-        });
-        el.handlers[eventName][nameSpace] = [];
+        if (eventName in el.handlers
+        && nameSpace in el.handlers[eventName]
+        && el.handlers[eventName][nameSpace].length > 0
+        ) {
+          el.handlers[eventName][nameSpace].forEach(function (handler) {
+            el.removeEventListener(eventName, handler, false);
+          });
+          el.handlers[eventName][nameSpace] = [];
+        }
       });
     } else {
       // el.off(click.popup)
       var [eventName, nameSpace = 'default'] = event.split('.');
-      el.handlers[eventName][nameSpace].forEach(function (handler, i) {
-        el.removeEventListener(eventName, handler, false);
-        //delete el.handlers[i];
-      });
-      el.handlers[eventName][nameSpace] = [];
+      if (eventName in el.handlers
+        && nameSpace in el.handlers[eventName]
+        && el.handlers[eventName][nameSpace].length > 0
+        ) {
+        el.handlers[eventName][nameSpace].forEach(function (handler) {
+          el.removeEventListener(eventName, handler, false);
+        });
+        el.handlers[eventName][nameSpace] = [];
+      }
     }
   } else {
     // el.off()
     keys(el.handlers).forEach(function (eventName2) {
       keys(el.handlers[eventName2]).forEach(function(nameSpace2) {
-        el.handlers[eventName2][nameSpace2].forEach(function (handler, i) {
+        el.handlers[eventName2][nameSpace2].forEach(function (handler) {
           el.removeEventListener(eventName2, handler, false);
-          //delete el.handlers[eventName2][nameSpace2][i];
         });
       });
     });
