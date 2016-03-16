@@ -6,33 +6,22 @@
     "ug": "-e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings"
   },
   "scripts": {
-
-
-    "ee": "rm -rf node_modules && npm i && npm link global && npm run otvet",
+    "0": "rollup -c rollup.conf.js -o dist/polyfills.js",
+    "s": "mkdir node_modules/global && cp -r ../global/dist node_modules/global/dist",
     "1": "npm link global",
     "2": "npm start && npm run polyfills && cat dist/shim.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
+    "ee": "rm -rf node_modules && npm i && npm link global && npm run otvet",
     "watch": "NODE_ENV=production babel src --out-dir . --watch",
     "start": "NODE_ENV=production babel src --out-dir .",
     "otvet": "npm start && npm run polyfills && npm run ug:otvet && npm run cp:otvet && npm run cp:otvet2",
-    
     "polyfills": "browserify polyfills.js dom.js dom4.js > dist/polyfills.js",
-    "ug:otvet": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js ../otvet.mail.ru/vendors/jquery-1.11.1.js ../otvet.mail.ru/vendors/lodash.2.4.0.js ../otvet.mail.ru/vendors/backbone.1.1.0.js ../otvet.mail.ru/vendors/portal-menu.0.1.44.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
+    "ug:otvet": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js ../otvet.mail.ru/vendors/jquery-1.11.1.js ../otvet.mail.ru/vendors/lodash.2.4.0.js ../otvet.mail.ru/vendors/backbone.1.1.0.js ../otvet.mail.ru/vendors/portal-menu.0.3.1.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
     "cp:otvet": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapibig/app/js/",
     "cp:otvet2": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/app/js/",
-    
-
-
-
-
     "newotvet": "npm start && npm run polyfills && cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > /Users/ikuznecov/projects/new.otvet.mail.ru/dev/polyfills.min.js",
-    
-
-
     "ug:touch": "cat dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
     "cp:touch": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/ && cp dist/polyfills.min.js* /Users/ikuznecov/projects/touch.otvet.mail.ru/app/js/",
     "touch": "npm start && npm run polyfills && npm run ug:touch && npm run cp:touch",
-
-
     "lite:ug:otvet": "cat dist/polyfills.js | uglifyjs -cm  > dist/polyfills.min.js",
     "cp:otvet:dev": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapibig",
     "get:all": "npm run get:shim & npm run get:sham & npm run get:shiv",
@@ -54,7 +43,6 @@
     "type": "git",
     "url": "https://github.com/QiV/misc"
   },
-  
   "keywords": [],
   "author": "killxxxvi@mail.ru",
   "license": "MIT",
@@ -151,14 +139,16 @@
       ]
     ]
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "webpack": "^2.1.0-beta.4"
+  },
   "babelify": "*",
   "browserify": {
     "transform": [
       "babelify"
     ]
   },
-  "browser": {
+  "__browser": {
     "global/document": "global/dist/bro.js",
     "global/body": "global/dist/bro.js",
     "global/window": "global/dist/bro.js",

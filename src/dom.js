@@ -1,4 +1,5 @@
-import {window, document, body, navigator, html as root} from 'global';
+ /*navigator,*/
+import {window, document, body, html as root} from 'global';
 import { isArray, isObject, isset, isNumber, isString, isNode, isFunction, keys } from './utils';
 
 var Np = window.Node.prototype;
@@ -81,7 +82,7 @@ if (ETp) {
     .reduce(reduceNodeMethods, {});
   Object.defineProperties(ETp, ETMethods);
 }
-var ua = navigator.userAgent;
+var ua = window.navigator.userAgent;
 if (ua.indexOf('MSIE ') !== -1 || ua.indexOf('Trident/') !== -1 || ua.indexOf('Edge/') !== -1) {
   // rewrite broken cloneNode method in IE
   var originalCloneNode = Np.cloneNode;
@@ -140,7 +141,7 @@ function off(event, fn) {
   if (!el) {
     return false;
   }
-/*    || !isset(this.handlers[eventName])
+  /*    || !isset(this.handlers[eventName])
     || !this.handlers[eventName][nameSpace] || !this.handlers[eventName][nameSpace].length*/
 
 

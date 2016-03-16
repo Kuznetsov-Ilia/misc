@@ -1,0 +1,9 @@
+{
+  "browser": {
+    "global/document": "global/dist/bro.js",
+    "global/body": "global/dist/bro.js",
+    "global/window": "global/dist/bro.js",
+    "global/html": "global/dist/bro.js",
+    "global": "global/dist/bro.js"
+  }
+}

@@ -153,7 +153,7 @@ function off(event, fn) {
     return false;
   }
   /*    || !isset(this.handlers[eventName])
-      || !this.handlers[eventName][nameSpace] || !this.handlers[eventName][nameSpace].length*/
+    || !this.handlers[eventName][nameSpace] || !this.handlers[eventName][nameSpace].length*/
 
   //не установлены хендлеры в принципе
   if (!(0, _utils.isset)(el.handlers)) {
