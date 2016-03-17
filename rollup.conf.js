@@ -1,4 +1,5 @@
 import npm from 'rollup-plugin-npm';
+import babel from 'rollup-plugin-babel';
 export default {
   entry: 'polyfills+dom+dom4.js',
   format: 'cjs',
@@ -26,6 +27,9 @@ export default {
       browser: false,
       // not all files you want to resolve are .js files
       extensions: [ '.js', '.json' ]
+    }),
+    babel({
+      exclude: 'node_modules/**'
     })
   ]
 };
