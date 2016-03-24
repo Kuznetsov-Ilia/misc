@@ -1,31 +1,19 @@
-exports.__esModule = true;
-
-var _global = require('global');
-
-var _utils = require('./utils');
-
-var _Promise = require('./Promise');
-
-var _Promise2 = _interopRequireDefault(_Promise);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var DEFAULT_TIMEOUT = 5000;
-var DONE = 4;
+import {window, document, body} from 'global';
+import {isEmpty, isString, isObject, isset, rand} from './utils';
+import Promise from './Promise';
+const DEFAULT_TIMEOUT = 5000;
+const DONE = 4;
 var fetch;
-if (_global.window.fetch) {
+if (window.fetch) {
   fetch = prepare(newfag);
 } else {
   fetch = prepare(oldschool);
 }
 
-exports.default = fetch;
-
+export default fetch;
 
 function prepare(callback) {
-  return function (method, url, data) {
-    var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
-
+  return function (method, url, data, options={}){
     method = method.toLowerCase();
     options = Object.assign({
       method: method,
@@ -37,41 +25,41 @@ function prepare(callback) {
     }, options);
 
     switch (method) {
-      case 'jsonp':
-        return jsonp(url, data, options);
-      case 'get':
-      case 'head':
-      case 'delete':
-        if ((0, _utils.isString)(data)) {
-          var sign = url.indexOf('?') === -1 ? '?' : '&';
-          url = url + sign + data;
-        } else if (!(0, _utils.isEmpty)(data)) {
-          url += '&' + Object.keys(data).map(encodeUrlParams(data)).join('&');
+    case 'jsonp':
+      return jsonp(url, data, options);
+    case 'get':
+    case 'head':
+    case 'delete':
+      if (isString(data)) {
+        var sign = url.indexOf('?') === -1 ? '?' : '&';
+        url = url + sign + data;
+      } else if (!isEmpty(data)) {
+        url += '&' + Object.keys(data).map(encodeUrlParams(data)).join('&');
+      }
+      if ('body' in options) {
+        delete options.body;
+      }
+      break;
+    case 'post':
+      options.credentials = 'include';
+      if (!isEmpty(data) && !isNativeDataTypesForXHR2(data)) {
+        if (options.headers['Content-type'].indexOf('json') >= 0) {
+          options.body = 'json=' + JSON.stringify(data);
+        } else {
+          options.body = Object.keys(data).map(encodeUrlParams(data)).join('&');
         }
-        if ('body' in options) {
-          delete options.body;
-        }
-        break;
-      case 'post':
-        options.credentials = 'include';
-        if (!(0, _utils.isEmpty)(data) && !isNativeDataTypesForXHR2(data)) {
-          if (options.headers['Content-type'].indexOf('json') >= 0) {
-            options.body = 'json=' + JSON.stringify(data);
-          } else {
-            options.body = Object.keys(data).map(encodeUrlParams(data)).join('&');
-          }
-        }
-        break;
-      case 'put':
-        options.headers['Content-type'] = 'application/json';
-        options.credentials = 'include';
-        if (!(0, _utils.isEmpty)(data) && !isNativeDataTypesForXHR2(data)) {
-          options.body = JSON.stringify(data);
-        }
-        break;
+      }
+      break;
+    case 'put':
+      options.headers['Content-type'] = 'application/json';
+      options.credentials = 'include';
+      if (!isEmpty(data) && !isNativeDataTypesForXHR2(data)) {
+        options.body = JSON.stringify(data);
+      }
+      break;
     }
 
-    if ((0, _utils.isset)(options.charset)) {
+    if (isset(options.charset)) {
       options.headers['Accept-charset'] = options.charset;
     }
 
@@ -80,19 +68,20 @@ function prepare(callback) {
 }
 
 function newfag(url, options) {
-  return _global.window.fetch(url, options).then(checkStatus);
+  return window.fetch(url, options).then(checkStatus);
 }
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response.json();
   } else {
-    return _Promise2.default.reject(new Error(response.statusText));
+    return Promise.reject(new Error(response.statusText));
   }
 }
 
+
 function oldschool(url, options) {
-  var xhr = new (_global.window.XMLHttpRequest || _global.window.ActiveXObject)('Microsoft.XMLHTTP');
+  var xhr = new (window.XMLHttpRequest || window.ActiveXObject)('Microsoft.XMLHTTP');
   var abort, progress;
   /* report progress */
   if (xhr.upload) {
@@ -101,7 +90,7 @@ function oldschool(url, options) {
   if (xhr.abort) {
     abort = xhr.abort;
   }
-  return (0, _Promise2.default)(function (resolve, reject) {
+  return Promise(function(resolve, reject) {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === DONE) {
         var status = xhr.status;
@@ -131,7 +120,7 @@ function oldschool(url, options) {
     var headers;
 
     Object.defineProperty(xhr, 'headers', {
-      get: function get() {
+      get: function () {
         if (!headers) {
           headers = parseHeaders(xhr.getAllResponseHeaders());
         }
@@ -159,6 +148,7 @@ function oldschool(url, options) {
 
     /* response timeout */
     setTimeout(xhr.abort.bind(xhr), options.timeout);
+
   }, abort, progress);
 }
 
@@ -168,9 +158,7 @@ function isValidStatus(status) {
 
 function parseHeaders(h) {
   var ret = {},
-      key,
-      val,
-      i;
+    key, val, i;
 
   h.split('\n').forEach(function (header) {
     if ((i = header.indexOf(':')) > 0) {
@@ -186,17 +174,20 @@ function parseHeaders(h) {
 }
 
 function isNativeDataTypesForXHR2(data) {
-  return 'FormData' in _global.window && data instanceof FormData || 'ArrayBuffer' in _global.window && data instanceof ArrayBuffer || 'ArrayBufferView' in _global.window && data instanceof ArrayBufferView || 'Blob' in _global.window && data instanceof Blob;
+  return 'FormData' in window && data instanceof FormData
+    || 'ArrayBuffer' in window && data instanceof ArrayBuffer
+    || 'ArrayBufferView' in window && data instanceof ArrayBufferView
+    || 'Blob' in window && data instanceof Blob;
 }
 
 function jsonp(url, data, options) {
-  return (0, _Promise2.default)(function (resolve, reject) {
-    var script = _global.document.createElement('script');
-    var _rand = '_' + (0, _utils.rand)();
+  return Promise(function(resolve, reject){
+    var script = document.createElement('script');
+    var _rand = '_' + rand();
     var callbackName = options && options.callbackName || 'callback';
-    if ((0, _utils.isString)(data)) {
+    if (isString(data)) {
       data += '&' + callbackName + '=' + _rand;
-    } else if ((0, _utils.isObject)(data)) {
+    } else if (isObject(data)) {
       data[callbackName] = _rand;
       data = Object.keys(data).map(encodeUrlParams(data)).join('&');
     } else {
@@ -204,24 +195,26 @@ function jsonp(url, data, options) {
     }
     var src = url + (url.indexOf('?') === -1 ? '?' : '') + data;
     var jsonpTimer;
-    _global.window[_rand] = function (res) {
+    window[_rand] = function (res) {
       clearTimeout(jsonpTimer);
       resolve(res);
-      _global.window[_rand] = null;
-      _global.body.removeChild(script);
+      window[_rand] = null;
+      body.removeChild(script);
     };
-    _global.body.appendChild(script);
+    body.appendChild(script);
     script.src = src;
-    jsonpTimer = setTimeout(function () {
-      _global.body.removeChild(script);
-      _global.window[_rand] = null;
+    jsonpTimer = setTimeout(()=> {
+      body.removeChild(script);
+      window[_rand] = null;
       reject('timeout');
     }, DEFAULT_TIMEOUT);
   });
 }
 
 function encodeUrlParams(obj) {
-  return function (key) {
+  return function(key) {
     return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
   };
 }
+
+

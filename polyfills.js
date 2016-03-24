@@ -9,7 +9,7 @@ Object.assign = Object.assign || extend;
 /* array */
 if (!arrayProto.find) {
   arrayProps.find = {
-    value: function value(predicate) {
+    value: function (predicate) {
       if (this === null) {
         throw new TypeError('Array.prototype.find called on null or undefined');
       }
@@ -36,9 +36,9 @@ if (!arrayProto.includes) {
     value: has
   };
 }
-arrayProps.matches = { value: has };
-arrayProps.contains = { value: has };
-arrayProps.has = { value: has };
+arrayProps.matches = {value: has};
+arrayProps.contains = {value: has};
+arrayProps.has = {value: has};
 
 if (!Array.from) {
   Array.from = function (iterable) {
@@ -57,17 +57,18 @@ if (!Array.from) {
   };
 }*/
 
+
 /* string */
 if (!stringProto.includes) {
   stringProto.includes = has;
 }
-stringProps.matches = { value: has };
-stringProps.contains = { value: has };
-stringProps.has = { value: has };
+stringProps.matches = {value: has};
+stringProps.contains = {value: has};
+stringProps.has = {value: has};
 
 if (!stringProto.startsWith) {
   stringProps.startsWith = {
-    value: function value(string, position) {
+    value: function (string, position) {
       if (!position) {
         position = 0;
       }
@@ -77,7 +78,7 @@ if (!stringProto.startsWith) {
 }
 if (!stringProto.endsWith) {
   stringProps.endsWith = {
-    value: function value(string, position) {
+    value: function (string, position) {
       var lastIndex;
       position = position || this.length;
       position = position - string.length;
@@ -98,7 +99,11 @@ if (!Number.isFinite) {
 }
 if (!Number.isInteger) {
   Number.isInteger = function (value) {
-    return typeof value === 'number' && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) === value;
+    return typeof value === 'number'
+      && isFinite(value)
+      && value > -9007199254740992
+      && value < 9007199254740992
+      && Math.floor(value) === value;
   };
 }
 if (!Number.isNaN) {

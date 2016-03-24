@@ -1,16 +1,8 @@
-exports.__esModule = true;
+import window from 'global';
+export default cookie;
 
-var _global = require('global');
-
-var _global2 = _interopRequireDefault(_global);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = cookie;
-
-
-var encode = _global2.default.encodeURIComponent;
-var decode = _global2.default.decodeURIComponent;
+var encode = window.encodeURIComponent;
+var decode = window.decodeURIComponent;
 
 function read(s) {
   if (s.indexOf('"') === 0) {
@@ -30,8 +22,7 @@ function read(s) {
 }
 
 function cookie(key, value, options) {
-  if (value !== undefined) {
-    // Write
+  if (value !== undefined) { // Write
     options = options || {};
 
     if (typeof options.expires === 'number') {
@@ -44,9 +35,14 @@ function cookie(key, value, options) {
       options.path = '/';
     }
 
-    document.cookie = [encode(key), '=', encode(String(value)),
-    // use expires attribute, max-age is not supported by IE
-    options.expires ? '; expires=' + options.expires.toUTCString() : '', options.path ? '; path=' + options.path : '', options.domain ? '; domain=' + options.domain : '', options.secure ? '; secure' : ''].join('');
+    document.cookie = [
+      encode(key), '=', encode(String(value)),
+      // use expires attribute, max-age is not supported by IE
+      options.expires ? '; expires=' + options.expires.toUTCString() : '',
+      options.path ? '; path=' + options.path : '',
+      options.domain ? '; domain=' + options.domain : '',
+      options.secure ? '; secure' : ''
+    ].join('');
   }
 
   // Read
@@ -77,7 +73,7 @@ function cookie(key, value, options) {
   return result;
 }
 
-cookie.remove = function (key, options) {
+cookie.remove = function(key, options) {
   if (cookie(key) !== undefined) {
     cookie(key, '', Object.assign({}, options, {
       expires: new Date(1000),

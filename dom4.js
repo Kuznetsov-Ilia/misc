@@ -1,9 +1,8 @@
-var _global = require('global');
-
-var property; //https://github.com/WebReflection/dom4
+//https://github.com/WebReflection/dom4
 /* jshint loopfunc: true, noempty: false*/
 // http://www.w3.org/TR/dom/#element
-
+import { window, document } from 'global';
+var property;
 var TemporaryPrototype;
 var TemporaryTokenList;
 var wrapVerifyToken;
@@ -13,14 +12,14 @@ var splice = ArrayPrototype.splice;
 var join = ArrayPrototype.join;
 var push = ArrayPrototype.push;
 var defineProperty = Object.defineProperty;
-var NodePrototype = _global.window.Node.prototype;
-var ElementPrototype = _global.window.Element.prototype;
-var SVGElement = _global.window.SVGElement;
+var NodePrototype = window.Node.prototype;
+var ElementPrototype = window.Element.prototype;
+var SVGElement = window.SVGElement;
 var classListDescriptor = {
   get: function get() {
     return new DOMTokenList(this);
   },
-  set: function set() {}
+  set: function () {}
 };
 var trim = /^\s+|\s+$/g;
 var spaces = /\s+/;
@@ -29,10 +28,13 @@ var CLASS_LIST = 'classList';
 
 // most likely an IE9 only issue
 // see https://github.com/WebReflection/dom4/issues/6
-if (!_global.document.createElement('a').matches('a')) {
+if (!document.createElement('a').matches('a')) {
   NodePrototype[property] = function (matches) {
     return function (selector) {
-      return matches.call(this.parentNode ? this : createDocumentFragment().appendChild(this), selector);
+      return matches.call(
+        this.parentNode ? this : createDocumentFragment().appendChild(this),
+        selector
+      );
     };
   }(NodePrototype[property]);
 }
@@ -40,7 +42,7 @@ if (!_global.document.createElement('a').matches('a')) {
 // used to fix both old webkit and SVG
 DOMTokenList.prototype = {
   length: 0,
-  add: function add() {
+  add: function () {
     for (var j = 0, token; j < arguments.length; j++) {
       token = arguments[j];
       if (!this.contains(token)) {
@@ -53,13 +55,13 @@ DOMTokenList.prototype = {
       this._.className = '' + this;
     }
   },
-  contains: function contains(token) {
+  contains: function (token) {
     return indexOf.call(this, property = verifyToken(token)) > -1;
   },
-  item: function item(i) {
+  item: function (i) {
     return this[i] || null;
   },
-  remove: function remove() {
+  remove: function () {
     for (var j = 0, token; j < arguments.length; j++) {
       token = arguments[j];
       if (this.contains(token)) {
@@ -86,12 +88,12 @@ if (SVGElement && !(CLASS_LIST in SVGElement.prototype)) {
 // iOS 5.1 has completely screwed this property
 // classList in ElementPrototype is false
 // but it's actually there as getter
-if (!(CLASS_LIST in _global.document.documentElement)) {
+if (!(CLASS_LIST in document.documentElement)) {
   defineProperty(ElementPrototype, CLASS_LIST, classListDescriptor);
 } else {
   // iOS 5.1 and Nokia ASHA do not support multiple add or remove
   // trying to detect and fix that in here
-  TemporaryTokenList = _global.document.createElement('div')[CLASS_LIST];
+  TemporaryTokenList = document.createElement('div')[CLASS_LIST];
   TemporaryTokenList.add('a', 'b', 'a');
   if (TemporaryTokenList !== 'a\x20b') {
     // no other way to reach original methods in iOS 5.1
@@ -100,7 +102,7 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
       // ASHA double fails in here
       TemporaryPrototype = TemporaryTokenList.prototype;
     }
-    wrapVerifyToken = function wrapVerifyToken(original) {
+    wrapVerifyToken = function (original) {
       return function () {
         var i = 0;
         while (i < arguments.length) {
@@ -117,15 +119,21 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
 
 // requestAnimationFrame partial polyfill
 (function () {
-  for (var raf, rAF = _global.window.requestAnimationFrame, cAF = _global.window.cancelAnimationFrame, prefixes = ['o', 'ms', 'moz', 'webkit'], i = prefixes.length; !cAF && i--;) {
-    rAF = rAF || _global.window[prefixes[i] + 'RequestAnimationFrame'];
-    cAF = _global.window[prefixes[i] + 'CancelAnimationFrame'] || _global.window[prefixes[i] + 'CancelRequestAnimationFrame'];
+  for (var
+      raf,
+      rAF = window.requestAnimationFrame,
+      cAF = window.cancelAnimationFrame,
+      prefixes = ['o', 'ms', 'moz', 'webkit'],
+      i = prefixes.length; !cAF && i--; ) {
+    rAF = rAF || window[prefixes[i] + 'RequestAnimationFrame'];
+    cAF = window[prefixes[i] + 'CancelAnimationFrame'] ||
+      window[prefixes[i] + 'CancelRequestAnimationFrame'];
   }
   if (!cAF) {
     // some FF apparently implemented rAF but no cAF
     if (rAF) {
       raf = rAF;
-      rAF = function rAF(callback) {
+      rAF = function (callback) {
         var goOn = true;
         raf(function () {
           if (goOn) {
@@ -136,32 +144,35 @@ if (!(CLASS_LIST in _global.document.documentElement)) {
           goOn = false;
         };
       };
-      cAF = function cAF(id) {
+      cAF = function (id) {
         id();
       };
     } else {
-      rAF = function rAF(callback) {
+      rAF = function (callback) {
         return setTimeout(callback, 15, 15);
       };
-      cAF = function cAF(id) {
+      cAF = function (id) {
         clearTimeout(id);
       };
     }
   }
-  _global.window.requestAnimationFrame = rAF;
-  _global.window.cancelAnimationFrame = cAF;
-})();
+  window.requestAnimationFrame = rAF;
+  window.cancelAnimationFrame = cAF;
+}());
 
 // http://www.w3.org/TR/dom/#customevent
 try {
-  new _global.window.CustomEvent('?');
+  new window.CustomEvent('?');
 } catch (o_O) {
-  _global.window.CustomEvent = function (eventName, defaultInitDict) {
+  window.CustomEvent = function (
+    eventName,
+    defaultInitDict
+  ) {
 
     // the infamous substitute
     function CustomEvent(type, eventInitDict) {
       /*jshint eqnull:true */
-      var event = _global.document.createEvent(eventName);
+      var event = document.createEvent(eventName);
       if (typeof type !== 'string') {
         throw new Error('An event name must be provided');
       }
@@ -171,12 +182,19 @@ try {
       if (eventInitDict == null) {
         eventInitDict = defaultInitDict;
       }
-      event.initCustomEvent(type, eventInitDict.bubbles, eventInitDict.cancelable, eventInitDict.detail);
+      event.initCustomEvent(
+        type,
+        eventInitDict.bubbles,
+        eventInitDict.cancelable,
+        eventInitDict.detail
+      );
       return event;
     }
 
     // attached at runtime
-    function initCustomEvent(type, bubbles, cancelable, detail) {
+    function initCustomEvent(
+      type, bubbles, cancelable, detail
+    ) {
       /*jshint validthis:true*/
       this.initEvent(type, bubbles, cancelable);
       this.detail = detail;
@@ -185,19 +203,21 @@ try {
     // that's it
     return CustomEvent;
   }(
-  // is this IE9 or IE10 ?
-  // where CustomEvent is there
-  // but not usable as construtor ?
-  _global.window.CustomEvent ?
-  // use the CustomEvent interface in such case
-  'CustomEvent' : 'Event',
-  // otherwise the common compatible one
-  {
-    bubbles: false,
-    cancelable: false,
-    detail: null
-  });
+    // is this IE9 or IE10 ?
+    // where CustomEvent is there
+    // but not usable as construtor ?
+    window.CustomEvent ?
+    // use the CustomEvent interface in such case
+    'CustomEvent' : 'Event',
+    // otherwise the common compatible one
+    {
+      bubbles: false,
+      cancelable: false,
+      detail: null
+    }
+  );
 }
+
 
 // http://www.w3.org/TR/domcore/#domtokenlist
 function verifyToken(token) {
@@ -210,18 +230,22 @@ function verifyToken(token) {
 }
 
 function DOMTokenList(node) {
-  var className = node.className,
-      isSVG = typeof className === 'object',
-      value = (isSVG ? className.baseVal : className).replace(trim, '');
+  var
+    className = node.className,
+    isSVG = typeof className === 'object',
+    value = (isSVG ? className.baseVal : className).replace(trim, '');
   if (value.length) {
-    push.apply(this, value.split(spaces));
+    push.apply(
+      this,
+      value.split(spaces)
+    );
   }
   this._isSVG = isSVG;
   this._ = node;
 }
 
 function createDocumentFragment() {
-  return _global.document.createDocumentFragment();
+  return document.createDocumentFragment();
 }
 
 function toggle(token, force) {

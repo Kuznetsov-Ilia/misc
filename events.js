@@ -1,14 +1,11 @@
-exports.__esModule = true;
-exports.Eventable = Eventable;
+// TODO: https://gist.github.com/RubaXa/8662836
 
-var _utils = require('misc/utils');
-
-var slice = Array.prototype.slice; // TODO: https://gist.github.com/RubaXa/8662836
-
+import { isFunction } from 'misc/utils';
+var slice = Array.prototype.slice;
 var Events = {
   // Bind an event to a `callback` function. Passing `"all"` will bind
   // the callback to all events fired.
-  on: function on(name, callback, context) {
+  on: function (name, callback, context) {
     if (!eventsApi(this, 'on', name, [callback, context]) || !callback) {
       return this;
     }
@@ -26,12 +23,12 @@ var Events = {
 
   // Bind an event to only be triggered a single time. After the first time
   // the callback is invoked, it will be removed.
-  once: function once(name, callback, context) {
+  once: function (name, callback, context) {
     if (!eventsApi(this, 'once', name, [callback, context]) || !callback) {
       return this;
     }
     var self = this;
-    var _once = _once2(function () {
+    var _once = once(function () {
       self.off(name, _once);
       callback.apply(this, arguments);
     });
@@ -43,7 +40,7 @@ var Events = {
   // callbacks with that function. If `callback` is null, removes all
   // callbacks for the event. If `name` is null, removes all bound
   // callbacks for all events.
-  off: function off(name, callback, context) {
+  off: function (name, callback, context) {
     var retain, ev, events, names, i, l, j, k;
     if (!this._events || !eventsApi(this, 'off', name, [callback, context])) {
       return this;
@@ -61,7 +58,8 @@ var Events = {
         if (callback || context) {
           for (j = 0, k = events.length; j < k; j++) {
             ev = events[j];
-            if (callback && callback !== ev.callback && callback !== ev.callback._callback || context && context !== ev.context) {
+            if ((callback && callback !== ev.callback && callback !== ev.callback._callback) ||
+              (context && context !== ev.context)) {
               retain.push(ev);
             }
           }
@@ -79,7 +77,7 @@ var Events = {
   // passed the same arguments as `trigger` is, apart from the event name
   // (unless you're listening on `"all"`, which will cause your callback to
   // receive the true name of the event as the first argument).
-  trigger: function trigger(name) {
+  trigger: function (name) {
     if (!this._events) {
       return this;
     }
@@ -100,7 +98,7 @@ var Events = {
 
   // Tell this object to stop listening to either specific events ... or
   // to every object it's currently listening to.
-  stopListening: function stopListening(obj, name, callback) {
+  stopListening: function (obj, name, callback) {
     var listeningTo = this._listeningTo;
     if (!listeningTo) {
       return this;
@@ -134,6 +132,8 @@ var uniqueId = 0;
 // listening to.
 var implementation;
 
+
+
 for (var method in listenMethods) {
   implementation = listenMethods[method];
   Events[method] = function (obj, name, callback) {
@@ -148,10 +148,11 @@ for (var method in listenMethods) {
   };
 }
 
-function _once2(func) {
-  var ran, result;
+function once(func) {
+  var ran,
+    result;
 
-  if (!(0, _utils.isFunction)(func)) {
+  if (!isFunction(func)) {
     throw new TypeError();
   }
   return function () {
@@ -166,6 +167,7 @@ function _once2(func) {
     return result;
   };
 }
+
 
 // Implement fancy features of the Events API such as multiple event
 // names `"change blur"` and jQuery-style event maps `{change: action}`
@@ -200,40 +202,40 @@ function eventsApi(obj, action, name, rest) {
 // Backbone events have 3 arguments).
 function triggerEvents(events, args) {
   var ev,
-      i = -1,
-      l = events.length,
-      a1 = args[0],
-      a2 = args[1],
-      a3 = args[2];
+    i = -1,
+    l = events.length,
+    a1 = args[0],
+    a2 = args[1],
+    a3 = args[2];
   switch (args.length) {
-    case 0:
-      while (++i < l) {
-        (ev = events[i]).callback.call(ev.ctx);
-      }
-      return;
-    case 1:
-      while (++i < l) {
-        (ev = events[i]).callback.call(ev.ctx, a1);
-      }
-      return;
-    case 2:
-      while (++i < l) {
-        (ev = events[i]).callback.call(ev.ctx, a1, a2);
-      }
-      return;
-    case 3:
-      while (++i < l) {
-        (ev = events[i]).callback.call(ev.ctx, a1, a2, a3);
-      }
-      return;
-    default:
-      while (++i < l) {
-        (ev = events[i]).callback.apply(ev.ctx, args);
-      }
+  case 0:
+    while (++i < l) {
+      (ev = events[i]).callback.call(ev.ctx);
+    }
+    return;
+  case 1:
+    while (++i < l) {
+      (ev = events[i]).callback.call(ev.ctx, a1);
+    }
+    return;
+  case 2:
+    while (++i < l) {
+      (ev = events[i]).callback.call(ev.ctx, a1, a2);
+    }
+    return;
+  case 3:
+    while (++i < l) {
+      (ev = events[i]).callback.call(ev.ctx, a1, a2, a3);
+    }
+    return;
+  default:
+    while (++i < l) {
+      (ev = events[i]).callback.apply(ev.ctx, args);
+    }
   }
 }
 
-exports.default = Events;
-function Eventable(target) {
+export default Events;
+export function Eventable(target) {
   return Object.assign(target, Events);
 }
