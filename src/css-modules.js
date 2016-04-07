@@ -3,7 +3,7 @@ import { createFilter } from 'rollup-pluginutils';
 import postcss from 'postcss';
 import CssModules from 'css-modules-loader-core';
 import { join, dirname, relative } from 'path';
-import { writeFile, readFile } from 'fs';
+import { /*writeFile,*/ readFile } from 'fs';
 import glob from 'glob';
 function pathJoin(file) {
   return join(process.cwd(), file);
@@ -14,8 +14,8 @@ var trace = 0;
 const cssModules = new CssModules();
 export default function (options = {}) {
   const filter = createFilter(options.include, options.exclude);
-  const outputFile = typeof options.output === 'string';
-  const outputFunction = typeof options.output === 'function';
+  /*const outputFile = typeof options.output === 'string';
+  const outputFunction = typeof options.output === 'function';*/
   return {
     transform(source, id) {
       if (!filter(id)) {
@@ -30,7 +30,7 @@ export default function (options = {}) {
         }
       };
       const relativePath = relative(process.cwd(), id);
-      console.log('relativePath', relativePath);
+      //console.log('relativePath', relativePath);
       trace++;
       var cache = (res) => {
         cached[relativePath] = res;
@@ -59,6 +59,7 @@ export default function (options = {}) {
       ;
     },
     transformBundle() {
+      console.log('writing css to:', options.output);
       fs.writeFile(options.output, cssfile.join(''));
     }
   };

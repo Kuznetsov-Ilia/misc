@@ -37,7 +37,7 @@ function cssModules$1 () {
         }
       };
       var relativePath = path.relative(process.cwd(), id);
-      console.log('relativePath', relativePath);
+      //console.log('relativePath', relativePath);
       trace++;
       var cache = function cache(res) {
         cached[relativePath] = res;
@@ -107,7 +107,7 @@ function pathFetcher(file, relativeTo, depTrace) {
       if (!file.endsWith('.css')) {
         sourcePath += '.css';
       }
-      console.log('pathFetcher', sourcePath);
+      //console.log('pathFetcher', sourcePath);
     }
   return new Promise(function (resolve, reject) {
     var _cached = cached[sourcePath];
