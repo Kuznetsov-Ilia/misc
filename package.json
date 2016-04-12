@@ -7,9 +7,10 @@
     "ug": "-e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings"
   },
   "scripts": {
-    "css": "rollup -c build/css-modules.rollup.conf.js",
     "1": "npm link global",
     "2": "npm start && npm run polyfills && cat dist/shim.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
+    "start": "NODE_ENV=production babel --presets=babel-preset-normal-please src --out-dir .",
+    "css": "rollup -c build/css-modules.rollup.conf.js",
     "s": "mkdir node_modules/global && cp -r ../global/dist node_modules/global/dist",
     "ee": "rm -rf node_modules && npm i && npm link global && npm run otvet",
     "otvet": "npm run polyfills && npm run ug:otvet && npm run cp:otvet && npm run cp:otvet2",
@@ -49,8 +50,6 @@
     "url": "https://github.com/QiV/misc/issues"
   },
   "dependencies": {
-    "rollup-plugin-babel": "^2.4.0",
-    "webpack": "^2.1.0-beta.4",
     "babel-plugin-check-es2015-constants": "*",
     "babel-plugin-transform-do-expressions": "*",
     "babel-plugin-transform-es2015-arrow-functions": "*",
@@ -72,8 +71,11 @@
     "babel-plugin-transform-es2015-unicode-regex": "*",
     "babel-plugin-transform-function-bind": "*",
     "babel-plugin-transform-regenerator": "*",
+    "babel-preset-normal-please": "0.0.2",
+    "rollup-plugin-babel": "^2.4.0",
+    "spritesmith": "*",
     "uglify-js": "*",
-    "spritesmith": "*"
+    "webpack": "^2.1.0-beta.4"
   },
   "babel": {
     "plugins": [

@@ -1,16 +1,12 @@
-var LOADED = {};
-import {document} from 'global';
-//import Promise from './Promise';
-//import fetch from './fetch';
-var head = document.getElementsByTagName('head')[0] || document.documentElement;
+exports.__esModule = true;
 
-export default function (src) {
+exports.default = function (src) {
   //return fetch().
   return new Promise(function (resolve, reject) {
     if (LOADED[src]) {
       resolve();
     } else {
-      var script = document.createElement('script');
+      var script = _global.document.createElement('script');
       var loadTimer = setTimeout(reject, 5000);
       var done = false;
       script.onload = script.onreadystatechange = function () {
@@ -32,4 +28,12 @@ export default function (src) {
       head.insertBefore(script, head.firstChild);
     }
   });
-}
+};
+
+var _global = require('global');
+
+var LOADED = {};
+
+//import Promise from './Promise';
+//import fetch from './fetch';
+var head = _global.document.getElementsByTagName('head')[0] || _global.document.documentElement;

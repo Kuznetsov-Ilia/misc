@@ -1,6 +1,14 @@
-import {isRegExp, isFunction, result, keys, isArray, inherits, isset} from './utils';
-import HISTORY from './history';
-import {Eventable} from './events';
+exports.__esModule = true;
+
+var _utils = require('./utils');
+
+var _history = require('./history');
+
+var _history2 = _interopRequireDefault(_history);
+
+var _events = require('./events');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Routers map faux-URLs to actions, and fire events when routes are
 // matched. Creating a new one sets its `routes` hash, if not set statically.
@@ -19,22 +27,25 @@ function Router(options) {
     }
     Object.assign(this.routes, options.routes);
   }
-  if (isFunction(this.init)) {
+  if ((0, _utils.isFunction)(this.init)) {
     this.init(options);
   }
   bindRoutes(this);
 }
 
-Object.assign(Eventable(Router.prototype), {
+Object.assign((0, _events.Eventable)(Router.prototype), {
   // Manually bind a single named route to a callback. For example:
   //
   //     this.route('search/:query/p:num', 'search', function(query, num) {
   //       ...
   //     });
   //
-  route (route, name/*, callback*/) {
-    if (!isRegExp(route)) {
-      route = routeToRegExp(route);
+
+  route: function route(_route, name /*, callback*/) {
+    var _this2 = this;
+
+    if (!(0, _utils.isRegExp)(_route)) {
+      _route = routeToRegExp(_route);
     }
     /*if (isFunction(name)) {
       callback = name;
@@ -43,12 +54,12 @@ Object.assign(Eventable(Router.prototype), {
     if (!callback) {
       callback = this[name];
     }*/
-    this.history.route(route, fragment => {
-      var args = extractParameters(route, fragment);
+    this.history.route(_route, function (fragment) {
+      var args = extractParameters(_route, fragment);
       //if (this.execute(callback, args, name) !== false) {
-        //this.trigger.apply(this, ['route:' + name].concat(args));
-      this.trigger('route', name, args);
-        //HISTORY.trigger('route', this, name, args);
+      //this.trigger.apply(this, ['route:' + name].concat(args));
+      _this2.trigger('route', name, args);
+      //HISTORY.trigger('route', this, name, args);
       //}
     });
     return this;
@@ -56,31 +67,31 @@ Object.assign(Eventable(Router.prototype), {
 
   // Execute a route handler with the provided parameters.  This is an
   // excellent place to do pre-route setup or post-route cleanup.
-  execute (callback, args/*, name*/) {
+  execute: function execute(callback, args /*, name*/) {
     if (callback) {
       callback.apply(this, args);
     }
   },
 
   // Simple proxy to `HISTORY` to save a fragment into the history.
-  navigate (fragment, options) {
+  navigate: function navigate(fragment, options) {
     this.history.navigate(fragment, options);
     return this;
   },
 
-  history: HISTORY
+  history: _history2.default
 
 });
-Router.assign = inherits;
+Router.assign = _utils.inherits;
 
 // Bind all defined routes to `HISTORY`. We have to reverse the
 // order of the routes here to support behavior where the most general
 // routes can be defined at the bottom of the route map.
-function bindRoutes (_this) {
-  var routes = result(_this, 'routes');
-  if (isset(routes)) {
+function bindRoutes(_this) {
+  var routes = (0, _utils.result)(_this, 'routes');
+  if ((0, _utils.isset)(routes)) {
     var route;
-    var routeKeys = keys(routes);
+    var routeKeys = (0, _utils.keys)(routes);
     while ((route = routeKeys.pop()) !== undefined) {
       _this.route(route, routes[route]);
     }
@@ -89,24 +100,23 @@ function bindRoutes (_this) {
 
 // Convert a route string into a regular expression, suitable for matching
 // against the current location hash.
-function routeToRegExp (route) {
-  route = route
-    .replace(escapeRegExp, '\\$&')
-    .replace(optionalParam, '(?:$1)?')
-    .replace(namedParam, (match, optional) => optional ? match : '([^/?]+)')
-    .replace(splatParam, '([^?]*?)');
+function routeToRegExp(route) {
+  route = route.replace(escapeRegExp, '\\$&').replace(optionalParam, '(?:$1)?').replace(namedParam, function (match, optional) {
+    return optional ? match : '([^/?]+)';
+  }).replace(splatParam, '([^?]*?)');
   return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$');
 }
 
 // Given a route, and a URL fragment that it matches, return the array of
 // extracted decoded parameters. Empty or unmatched parameters will be
 // treated as `null` to normalize cross-browser behavior.
-function extractParameters (route, fragment) {
+function extractParameters(route, fragment) {
   return route.exec(fragment).slice(1).map(function (param, i) {
-    if (isArray(param) && param.length === i + 1) { // Don't decode the search params.
+    if ((0, _utils.isArray)(param) && param.length === i + 1) {
+      // Don't decode the search params.
       return param || null;
     }
     return param ? decodeURIComponent(param) : null;
   });
 }
-export default Router;
+exports.default = Router;

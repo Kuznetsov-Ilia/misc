@@ -1,3 +1,6 @@
+exports.__esModule = true;
+
+var _events = require('./events');
 
 // Backbone.History
 // ----------------
@@ -9,12 +12,11 @@
 // falls back to polling.
 
 var W = window;
-import {Eventable} from './events';
 
-var routeStripper = /^[#\/]|\s+$/g;// Cached regex for stripping a leading hash/slash and trailing space.
-var rootStripper = /^\/+|\/+$/g;// Cached regex for stripping leading and trailing slashes.
-var pathStripper = /#.*$/;// Cached regex for stripping urls of hash.
-var isHistoryStarted = false;// Has the history handling already been started?
+var routeStripper = /^[#\/]|\s+$/g; // Cached regex for stripping a leading hash/slash and trailing space.
+var rootStripper = /^\/+|\/+$/g; // Cached regex for stripping leading and trailing slashes.
+var pathStripper = /#.*$/; // Cached regex for stripping urls of hash.
+var isHistoryStarted = false; // Has the history handling already been started?
 
 function History() {
   // The default interval to poll for hash changes, if necessary, is
@@ -29,28 +31,30 @@ function History() {
   }
 }
 
-Object.assign(Eventable(History.prototype), {
- // Are we at the app root?
-  atRoot () {
+Object.assign((0, _events.Eventable)(History.prototype), {
+  // Are we at the app root?
+
+  atRoot: function atRoot() {
     var path = this.location.pathname.replace(/[^\/]$/, '$&/');
     return path === this.root && !this.getSearch();
   },
+
   // In IE6, the hash fragment and search params are incorrect if the
   // fragment contains `?`.
-  getSearch () {
+  getSearch: function getSearch() {
     var match = this.location.href.replace(/#.*/, '').match(/\?.+/);
     return match ? match[0] : '';
   },
 
   // Gets the true hash value. Cannot use location.hash directly due to bug
   // in Firefox where location.hash will always be decoded.
-  getHash (window) {
+  getHash: function getHash(window) {
     var match = (window || this).location.href.match(/#(.*)$/);
     return match ? match[1] : '';
   },
 
   // Get the pathname and search params, without the root.
-  getPath () {
+  getPath: function getPath() {
     var path = decodeURI(this.location.pathname + this.getSearch());
     var root = this.root.slice(0, -1);
     if (!path.indexOf(root)) {
@@ -60,7 +64,7 @@ Object.assign(Eventable(History.prototype), {
   },
 
   // Get the cross-browser normalized URL fragment from the path or hash.
-  getFragment (fragment) {
+  getFragment: function getFragment(fragment) {
     if (fragment === null || fragment === undefined) {
       if (this._hasPushState || !this._wantsHashChange) {
         fragment = this.getPath();
@@ -73,7 +77,7 @@ Object.assign(Eventable(History.prototype), {
 
   // Start the hash change handling, returning `true` if the current URL matches
   // an existing route, and `false` otherwise.
-  start (options) {
+  start: function start(options) {
     if (isHistoryStarted) {
       throw new Error('Backbone.history has already been started');
     }
@@ -81,13 +85,13 @@ Object.assign(Eventable(History.prototype), {
 
     // Figure out the initial configuration. Do we need an iframe?
     // Is pushState desired ... is it available?
-    this.options          = Object.assign({root: '/'}, this.options, options);
-    this.root             = this.options.root;
+    this.options = Object.assign({ root: '/' }, this.options, options);
+    this.root = this.options.root;
     this._wantsHashChange = this.options.hashChange !== false;
-    this._hasHashChange   = 'onhashchange' in window;
-    this._wantsPushState  = !!this.options.pushState;
-    this._hasPushState    = !!(this.options.pushState && this.history && this.history.pushState);
-    this.fragment         = this.getFragment();
+    this._hasHashChange = 'onhashchange' in window;
+    this._wantsPushState = !!this.options.pushState;
+    this._hasPushState = !!(this.options.pushState && this.history && this.history.pushState);
+    this.fragment = this.getFragment();
 
     // Normalize root to always include a leading and trailing slash.
     this.root = ('/' + this.root + '/').replace(rootStripper, '/');
@@ -104,12 +108,11 @@ Object.assign(Eventable(History.prototype), {
         // Return immediately as browser will do redirect to new url
         return true;
 
-      // Or if we've started out with a hash-based route, but we're currently
-      // in a browser where it could be `pushState`-based instead...
+        // Or if we've started out with a hash-based route, but we're currently
+        // in a browser where it could be `pushState`-based instead...
       } else if (this._hasPushState && this.atRoot()) {
-        this.navigate(this.getHash(), {replace: true});
-      }
-
+          this.navigate(this.getHash(), { replace: true });
+        }
     }
     // Proxy an iframe to handle location events if the browser doesn't
     // support the `hashchange` event, HTML5 history, or the user wants
@@ -143,7 +146,7 @@ Object.assign(Eventable(History.prototype), {
 
   // Disable Backbone.history, perhaps temporarily. Not useful in a real app,
   // but possibly useful for unit testing Routers.
-  stop () {
+  stop: function stop() {
     W.off('popstate').off('hashchange');
     // Clean up the iframe if necessary.
     if (this.iframe) {
@@ -158,13 +161,13 @@ Object.assign(Eventable(History.prototype), {
 
   // Add a route to be tested when the fragment changes. Routes added later
   // may override previous routes.
-  route (route, callback) {
-    this.handlers.unshift({route: route, callback: callback});
+  route: function route(_route, callback) {
+    this.handlers.unshift({ route: _route, callback: callback });
   },
 
   // Checks the current URL to see if it has changed, and if it has,
   // calls `loadUrl`, normalizing across the hidden iframe.
-  checkUrl (/*e*/) {
+  checkUrl: function checkUrl() /*e*/{
     var current = this.getFragment();
     // If the user pressed the back button, the iframe's hash will have
     // changed and we should use that for comparison.
@@ -184,9 +187,9 @@ Object.assign(Eventable(History.prototype), {
   // Attempt to load the current URL fragment. If a route succeeds with a
   // match, returns `true`. If no defined routes matches the fragment,
   // returns `false`.
-  loadUrl (fragment) {
+  loadUrl: function loadUrl(fragment) {
     fragment = this.fragment = this.getFragment(fragment);
-    return this.handlers.some(function(handler) {
+    return this.handlers.some(function (handler) {
       if (handler.route.test(fragment)) {
         handler.callback(fragment);
         return true;
@@ -201,12 +204,12 @@ Object.assign(Eventable(History.prototype), {
   // The options object can contain `trigger: true` if you wish to have the
   // route callback be fired (not usually desirable), or `replace: true`, if
   // you wish to modify the current URL without adding an entry to the history.
-  navigate (fragment, options) {
+  navigate: function navigate(fragment, options) {
     if (!isHistoryStarted) {
       return false;
     }
     if (!options || options === true) {
-      options = {trigger: !!options};
+      options = { trigger: !!options };
     }
 
     // Normalize the fragment.
@@ -231,25 +234,25 @@ Object.assign(Eventable(History.prototype), {
     if (this._hasPushState) {
       this.history[options.replace ? 'replaceState' : 'pushState']({}, document.title, url);
 
-    // If hash changes haven't been explicitly disabled, update the hash
-    // fragment to store history.
+      // If hash changes haven't been explicitly disabled, update the hash
+      // fragment to store history.
     } else if (this._wantsHashChange) {
-      this._updateHash(this.location, fragment, options.replace);
-      if (this.iframe && (fragment !== this.getHash(this.iframe))) {
-        // Opening and closing the iframe tricks IE7 and earlier to push a
-        // history entry on hash-tag change.  When replace is true, we don't
-        // want this.
-        if(!options.replace) {
-          this.iframe.document.open().close();
+        this._updateHash(this.location, fragment, options.replace);
+        if (this.iframe && fragment !== this.getHash(this.iframe)) {
+          // Opening and closing the iframe tricks IE7 and earlier to push a
+          // history entry on hash-tag change.  When replace is true, we don't
+          // want this.
+          if (!options.replace) {
+            this.iframe.document.open().close();
+          }
+          this._updateHash(this.iframe.location, fragment, options.replace);
         }
-        this._updateHash(this.iframe.location, fragment, options.replace);
-      }
 
-    // If you've told us that you explicitly don't want fallback hashchange-
-    // based history, then `navigate` becomes a page refresh.
-    } else {
-      return this.location.assign(url);
-    }
+        // If you've told us that you explicitly don't want fallback hashchange-
+        // based history, then `navigate` becomes a page refresh.
+      } else {
+          return this.location.assign(url);
+        }
     if (options.trigger) {
       return this.loadUrl(fragment);
     }
@@ -257,7 +260,7 @@ Object.assign(Eventable(History.prototype), {
 
   // Update the hash location, either replacing the current entry, or adding
   // a new one to the browser history.
-  _updateHash (location, fragment, replace) {
+  _updateHash: function _updateHash(location, fragment, replace) {
     if (replace) {
       var href = location.href.replace(/(javascript:|#).*$/, '');
       location.replace(href + '#' + fragment);
@@ -268,5 +271,4 @@ Object.assign(Eventable(History.prototype), {
   }
 });
 
-export default new History();
-
+exports.default = new History();

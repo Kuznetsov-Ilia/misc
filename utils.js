@@ -1,12 +1,39 @@
-// inherit.js https://gist.github.com/RubaXa/8857525
-import {window, html as HTML} from 'global';
+exports.__esModule = true;
+exports.now = exports.extend = undefined;
+exports.isObject = isObject;
+exports.isEmpty = isEmpty;
+exports.isFunction = isFunction;
+exports.isRegExp = isRegExp;
+exports.isNode = isNode;
+exports.isArray = isArray;
+exports.isString = isString;
+exports.isNumber = isNumber;
+exports.isUndefined = isUndefined;
+exports.isset = isset;
+exports.is = is;
+exports.isEqual = isEqual;
+exports.isFragment = isFragment;
+exports.rand = rand;
+exports.result = result;
+exports.inherits = inherits;
+exports.pick = pick;
+exports.noop = noop;
+exports.contains = contains;
+exports.clone = clone;
+exports.keys = keys;
+exports.throttle = throttle;
+exports.debounce = debounce;
+exports.encode = encode;
+exports.strip_tags = strip_tags;
 
-export var extend = Object.assign;
+var _global = require('global');
 
-export function isObject(value) {
+var extend = exports.extend = Object.assign; // inherit.js https://gist.github.com/RubaXa/8857525
+
+function isObject(value) {
   return typeof value === 'object' && value !== null;
 }
-export function isEmpty(obj) {
+function isEmpty(obj) {
   if (!isObject(obj)) {
     return false;
   }
@@ -15,58 +42,58 @@ export function isEmpty(obj) {
   }
   return true;
 }
-export function isFunction(value) {
+function isFunction(value) {
   return typeof value === 'function';
 }
-export function isRegExp(value) {
+function isRegExp(value) {
   return isset(value) && value instanceof RegExp;
 }
-export function isNode(value) {
-  return value instanceof window.Node;
+function isNode(value) {
+  return value instanceof _global.window.Node;
 }
 if (!Array.isArray) {
   var op2str = Object.prototype.toString;
-  Array.isArray = function(a) {
+  Array.isArray = function (a) {
     return op2str.call(a) === '[object Array]';
   };
 }
-export function isArray(value) {
-  return Array.isArray(value);//return isset(value) && value instanceof Array;
+function isArray(value) {
+  return Array.isArray(value); //return isset(value) && value instanceof Array;
 }
-export function isString(value) {
+function isString(value) {
   return isset(value) && typeof value === 'string';
 }
-export function isNumber(value) {
+function isNumber(value) {
   return isset(value) && typeof value === 'number';
 }
-export function isUndefined(value) {
+function isUndefined(value) {
   return typeof value === undefined;
 }
-export function isset(value) {
+function isset(value) {
   return value !== undefined;
 }
-export function is(value) {
+function is(value) {
   return isset(value) && !!value;
 }
-export function isEqual(input1, input2) {
+function isEqual(input1, input2) {
   return input1 === input2 || JSON.stringify(input1) === JSON.stringify(input2);
 }
-export function isFragment(node) {
-  return isset(node) && node.nodeType === window.Node.DOCUMENT_FRAGMENT_NODE;
+function isFragment(node) {
+  return isset(node) && node.nodeType === _global.window.Node.DOCUMENT_FRAGMENT_NODE;
 }
-export var now = Date.now ? Date.now : function () {
+var now = exports.now = Date.now ? Date.now : function () {
   return Number(new Date());
 };
-export function rand() {
+function rand() {
   return (Math.random() * 1e17).toString(36).replace('.', '');
 }
-export function result(object, key) {
+function result(object, key) {
   if (isObject(object)) {
     var value = object[key];
     return isFunction(value) ? object[key]() : value;
   }
 }
-export function inherits(protoProps, staticProps) {
+function inherits(protoProps, staticProps) {
   // Helper function to correctly set up the prototype chain, for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
   // class properties to be extended.
@@ -78,7 +105,7 @@ export function inherits(protoProps, staticProps) {
   if (isset(protoProps) && protoProps.hasOwnProperty('constructor')) {
     child = protoProps.constructor;
   } else {
-    child = function () {
+    child = function child() {
       return _parent.apply(this, arguments);
     };
   }
@@ -87,7 +114,7 @@ export function inherits(protoProps, staticProps) {
   extend(child, _parent, staticProps);
   // Set the prototype chain to inherit from `parent`, without calling
   // `parent`'s constructor function.
-  var Surrogate = function () {
+  var Surrogate = function Surrogate() {
     this.constructor = child;
   };
   Surrogate.prototype = _parent.prototype;
@@ -105,7 +132,7 @@ export function inherits(protoProps, staticProps) {
 
   return child;
 }
-export function pick(input, _keys) {
+function pick(input, _keys) {
   /**
    * Creates a shallow clone of `object` composed of the specified properties.
    * Property names may be specified as individual arguments or as arrays of
@@ -123,15 +150,15 @@ export function pick(input, _keys) {
   });
   return output;
 }
-export function noop() {}
-export function contains(where, value) {
+function noop() {}
+function contains(where, value) {
   if (isArray(this) || isString(this)) {
     value = where;
     where = this;
   }
   return where.indexOf(value) !== -1;
 }
-export function clone(value) {
+function clone(value) {
   if (isNode(value)) {
     return value.cloneNode(true);
   } else if (isObject(value)) {
@@ -140,16 +167,12 @@ export function clone(value) {
     return value;
   }
 }
-export function keys(o) {
+function keys(o) {
   if (isObject(o)) {
     return Object.keys(o) || [];
   }
   return [];
 }
-
-
-
-
 
 /*function nodeListToNode(methodName) {
   return function () {
@@ -167,12 +190,11 @@ export function keys(o) {
   NLp[i] = HCp[i] = Ap[i] = nodeListToNode(i);
 }*/
 
-
-window.height = function () {
-  return HTML.clientHeight;
+_global.window.height = function () {
+  return _global.html.clientHeight;
 };
-window.width = function () {
-  return HTML.clientWidth;
+_global.window.width = function () {
+  return _global.html.clientWidth;
 };
 
 //D.height = docGabarits('height');
@@ -185,7 +207,7 @@ function docGabarits(name) {
 }
 */
 
-export function throttle(func, delay) {
+function throttle(func, delay) {
   if (isFunction(this)) {
     delay = func;
     func = this;
@@ -203,7 +225,7 @@ export function throttle(func, delay) {
   };
 }
 
-export function debounce(func, delay) {
+function debounce(func, delay) {
   if (isFunction(this)) {
     delay = func;
     func = this;
@@ -216,15 +238,13 @@ export function debounce(func, delay) {
   };
 }
 
-export function encode(str) {
+function encode(str) {
   return encodeURIComponent(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
 }
 var stripTagsRegExp;
-export function strip_tags(str) {
+function strip_tags(str) {
   if (typeof stripTagsRegExp === undefined) {
     stripTagsRegExp = /<\/?[^>]+>/gi;
   }
   return str.replace(stripTagsRegExp, '');
 }
-
-

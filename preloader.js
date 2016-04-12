@@ -1,10 +1,10 @@
-import {document} from 'global';
-var i;
-export default function(el, flag) {
+exports.__esModule = true;
+
+exports.default = function (el, flag) {
   if (el) {
     if (flag) {
       if (i === undefined) {
-        i = document.createElement('i');
+        i = _global.document.createElement('i');
         i.className = 'preloader';
       }
       el.appendChild(i);
@@ -12,4 +12,8 @@ export default function(el, flag) {
       i.remove();
     }
   }
-}
+};
+
+var _global = require('global');
+
+var i;

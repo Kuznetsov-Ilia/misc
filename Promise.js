@@ -1,36 +1,36 @@
+exports.__esModule = true;
 /**
     https://gist.github.com/RubaXa/8501359
 * @author RubaXa <trash@rubaxa.org>
 * @license MIT
 */
 
-export default Promise;
+exports.default = Promise;
 
 function noop() {}
 
-
 function _then(promise, method, callback) {
   return function () {
-    var args = arguments, retVal;
+    var args = arguments,
+        retVal;
 
     /* istanbul ignore else */
     if (typeof callback === 'function') {
       //try {
-        retVal = callback.apply(promise, args);
+      retVal = callback.apply(promise, args);
       //} catch (err) {
-        /*if (DEBUG) {
-          console.error(err);
-          throw err;
-        }
-        promise.reject(err);
-        return;
+      /*if (DEBUG) {
+        console.error(err);
+        throw err;
+      }
+      promise.reject(err);
+      return;
       }*/
 
       if (retVal && typeof retVal.then === 'function') {
         if (retVal.done && retVal.fail) {
           retVal.done(promise.resolve).fail(promise.reject);
-        }
-        else {
+        } else {
           retVal.then(promise.resolve, promise.reject);
         }
         return;
@@ -43,7 +43,6 @@ function _then(promise, method, callback) {
     promise[method].apply(promise, args);
   };
 }
-
 
 /**
  * «Обещания» поддерживают как [нативный](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -59,13 +58,13 @@ function Promise(executor, abort, progress) {
   var _args;
   var _doneFn = [];
   var _failFn = [];
-  var dfd = /** @lends Promise.prototype */ {
+  var dfd = /** @lends Promise.prototype */{
     /**
      * Добавляет обработчик, который будет вызван, когда «обещание» будет «разрешено»
      * @param  {Function}  fn  функция обработчик
      * @returns {Promise}
      */
-    done: function (fn) {
+    done: function done(fn) {
       _doneFn.push(fn);
       return dfd;
     },
@@ -75,7 +74,7 @@ function Promise(executor, abort, progress) {
      * @param  {Function}  fn  функция обработчик
      * @returns {Promise}
      */
-    fail: function (fn) {
+    fail: function fail(fn) {
       _failFn.push(fn);
       return dfd;
     },
@@ -86,25 +85,22 @@ function Promise(executor, abort, progress) {
      * @param   {Function}   [failFn]   или когда «обещание» будет «отменено»
      * @returns {Promise}
      */
-    then: function (doneFn, failFn) {
+    then: function then(doneFn, failFn) {
       var promise = Promise();
 
-      dfd
-        .done(_then(promise, 'resolve', doneFn))
-        .fail(_then(promise, 'reject', failFn))
-      ;
+      dfd.done(_then(promise, 'resolve', doneFn)).fail(_then(promise, 'reject', failFn));
 
       return promise;
     },
 
     notify: noop, // jQuery support
-    abort: () => {
+    abort: function abort() {
       _doneFn = [];
       _failFn = [];
       _completed = true;
     }, // jQuery support
     progress: progress || noop, // jQuery support
-    promise: function () {
+    promise: function promise() {
       // jQuery support
       return dfd;
     },
@@ -114,16 +110,14 @@ function Promise(executor, abort, progress) {
      */
     ttl: ttl,
 
-
     /**
      * Добавить обработчик «обещаний» в независимости от выполнения
      * @param   {Function}   fn   функция обработчик
      * @returns {Promise}
      */
-    always: function (fn) {
+    always: function always(fn) {
       return dfd.done(fn).fail(fn);
     },
-
 
     /**
      * «Разрешить» «обещание»
@@ -132,7 +126,6 @@ function Promise(executor, abort, progress) {
      * @returns  {Promise}
      */
     resolve: _setState(true),
-
 
     /**
      * «Отменить» «обещание»
@@ -143,7 +136,6 @@ function Promise(executor, abort, progress) {
     reject: _setState(false)
   };
 
-
   /**
    * @name  Promise#catch
    * @alias fail
@@ -153,18 +145,17 @@ function Promise(executor, abort, progress) {
     return dfd.then(null, fn);
   };
 
-
   // Работеам как native Promises
   /* istanbul ignore else */
   if (typeof executor === 'function') {
     //try {
-      executor(dfd.resolve, dfd.reject);
+    executor(dfd.resolve, dfd.reject);
     //} catch (err) {
-      /*if (DEBUG) {
-        console.error(err);
-        throw err;
-      }*/
-      /*dfd.reject(err);
+    /*if (DEBUG) {
+      console.error(err);
+      throw err;
+    }*/
+    /*dfd.reject(err);
     }*/
   }
 
@@ -181,10 +172,7 @@ function Promise(executor, abort, progress) {
       _completed = true;
 
       // Затираем методы
-      dfd.done =
-      dfd.fail =
-      dfd.resolve =
-      dfd.reject = function () {
+      dfd.done = dfd.fail = dfd.resolve = dfd.reject = function () {
         return dfd;
       };
 
@@ -197,10 +185,9 @@ function Promise(executor, abort, progress) {
       };
 
       var fn,
-        fns = state ? _doneFn : _failFn,
-        i = 0,
-        n = fns.length
-      ;
+          fns = state ? _doneFn : _failFn,
+          i = 0,
+          n = fns.length;
 
       for (; i < n; i++) {
         fn = fns[i];
@@ -227,29 +214,27 @@ function Promise(executor, abort, progress) {
 
 Promise.all = function (iterable) {
   var dfd = Promise(),
-    d,
-    i = 0,
-    n = iterable.length,
-    remain = n,
-    values = [],
-    _fn,
-    _doneFn = function (i, val) {
-      (i >= 0) && (values[i] = val);
+      d,
+      i = 0,
+      n = iterable.length,
+      remain = n,
+      values = [],
+      _fn,
+      _doneFn = function _doneFn(i, val) {
+    i >= 0 && (values[i] = val);
 
-      /* istanbul ignore else */
-      if (--remain <= 0) {
-        dfd.resolve(values);
-      }
-    },
-    _failFn = function (err) {
-      dfd.reject([err]);
+    /* istanbul ignore else */
+    if (--remain <= 0) {
+      dfd.resolve(values);
     }
-  ;
+  },
+      _failFn = function _failFn(err) {
+    dfd.reject([err]);
+  };
 
   if (remain === 0) {
     _doneFn();
-  }
-  else {
+  } else {
     for (; i < n; i++) {
       d = iterable[i];
 
@@ -260,8 +245,7 @@ Promise.all = function (iterable) {
         } else {
           d.then(_fn, _failFn);
         }
-      }
-      else {
+      } else {
         _doneFn(i, d);
       }
     }
@@ -269,7 +253,6 @@ Promise.all = function (iterable) {
 
   return dfd;
 };
-
 
 /**
  * Дождаться «разрешения» всех обещаний и вернуть результат последнего
@@ -284,7 +267,6 @@ Promise.race = function (iterable) {
   });
 };
 
-
 /**
  * Привести значение к «Обещанию»
  * @static
@@ -294,12 +276,10 @@ Promise.race = function (iterable) {
  */
 Promise.cast = function (value) {
   var promise = Promise().resolve(value);
-  return value && typeof value.then === 'function'
-    ? promise.then(function () { return value; })
-    : promise
-  ;
+  return value && typeof value.then === 'function' ? promise.then(function () {
+    return value;
+  }) : promise;
 };
-
 
 /**
  * Вернуть «разрешенное» обещание
@@ -312,7 +292,6 @@ Promise.resolve = function (value) {
   return Promise().resolve(value);
 };
 
-
 /**
  * Вернуть «отклоненное» обещание
  * @static
@@ -324,14 +303,16 @@ Promise.reject = function (value) {
   return Promise().reject(value);
 };
 
-
 /**
  * Дождаться «разрешения» всех обещаний
  * @param   {Object}  map «Ключь» => «Обещание»
  * @returns {Promise}
  */
 Promise.map = function (map) {
-  var array = [], key, idx = 0, results = {};
+  var array = [],
+      key,
+      idx = 0,
+      results = {};
 
   for (key in map) {
     array.push(map[key]);
@@ -356,10 +337,10 @@ function ttl(eventEmiter, eventName) {
   var _this = this;
   var XHR = this.XHR;
   if (eventName === 'remove' && XHR) {
-    eventEmiter.add([{ remove }]);// View.prototype.add
+    eventEmiter.add([{ remove: remove }]); // View.prototype.add
   } else {
-    eventEmiter.once(eventName, remove);
-  }
+      eventEmiter.once(eventName, remove);
+    }
   function remove() {
     _this.abort();
     if (XHR.status !== 200) {

@@ -1,42 +1,50 @@
-import window from 'global';
-import {Eventable} from 'misc/events';
-var STORAGE = Eventable({});
-if ('localStorage' in window) {
-  var localStorage = window.localStorage;
+exports.__esModule = true;
+
+var _global = require('global');
+
+var _global2 = _interopRequireDefault(_global);
+
+var _events = require('misc/events');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var STORAGE = (0, _events.Eventable)({});
+if ('localStorage' in _global2.default) {
+  var localStorage = _global2.default.localStorage;
   Object.assign(STORAGE, {
     isNative: true,
-    get: function(id) {
+    get: function get(id) {
       var value;
       try {
         value = localStorage.getItem(id);
-      } catch(e) {
+      } catch (e) {
         STORAGE.trigger({
           type: 'error',
           method: 'get',
-          data: {e, id}
+          data: { e: e, id: id }
         });
       }
       return value;
     },
-    set: function(id, value){
+    set: function set(id, value) {
       try {
         localStorage.setItem(id, value);
-      } catch(e) {
+      } catch (e) {
         STORAGE.trigger({
           type: 'error',
           method: 'set',
-          data: { e, id, value}
+          data: { e: e, id: id, value: value }
         });
       }
     },
-    remove: function(id) {
+    remove: function remove(id) {
       try {
         localStorage.removeItem(id);
-      } catch(e) {
+      } catch (e) {
         STORAGE.trigger({
           type: 'error',
           method: 'remove',
-          data: { e, id}
+          data: { e: e, id: id }
         });
       }
     }
@@ -45,18 +53,18 @@ if ('localStorage' in window) {
   Object.assign(STORAGE, {
     isNative: false,
     _data: {},
-    set: function (id, val) {
+    set: function set(id, val) {
       this._data[id] = String(val);
     },
-    get: function (id) {
+    get: function get(id) {
       return this._data.hasOwnProperty(id) ? this._data[id] : undefined;
     },
-    remove: function (id) {
+    remove: function remove(id) {
       return delete this._data[id];
     },
-    clear: function () {
+    clear: function clear() {
       this._data = {};
     }
   });
 }
-export default STORAGE;
+exports.default = STORAGE;

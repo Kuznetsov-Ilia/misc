@@ -1,16 +1,22 @@
-import {window, body} from 'global';
-export default function (className='disable-hover', interval=200) {
+exports.__esModule = true;
+
+exports.default = function () {
+  var className = arguments.length <= 0 || arguments[0] === undefined ? 'disable-hover' : arguments[0];
+  var interval = arguments.length <= 1 || arguments[1] === undefined ? 200 : arguments[1];
+
   var pointerEventsTimer;
   function pointerEvents() {
-    requestAnimationFrame(() => {
-      body.classList.add(className);
+    requestAnimationFrame(function () {
+      _global.body.classList.add(className);
       clearTimeout(pointerEventsTimer);
-      pointerEventsTimer = setTimeout(() => {
-        body.classList.remove(className);
+      pointerEventsTimer = setTimeout(function () {
+        _global.body.classList.remove(className);
       }, interval);
     });
   }
   if ('pointerEvents' in document.body.style) {
-    window.on('scroll', pointerEvents);
+    _global.window.on('scroll', pointerEvents);
   }
-}
+};
+
+var _global = require('global');

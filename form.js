@@ -1,4 +1,8 @@
-export function toJSON(form = this) {
+exports.__esModule = true;
+exports.toJSON = toJSON;
+function toJSON() {
+  var form = arguments.length <= 0 || arguments[0] === undefined ? this : arguments[0];
+
   var vals = {};
   for (var i = 0, l = form.length; i < l; i++) {
     var input = form[i];
@@ -7,26 +11,26 @@ export function toJSON(form = this) {
     }
     if (input instanceof HTMLInputElement) {
       switch (input.type) {
-      case 'checkbox':
-        if (input.checked) {
-          vals[input.name] = vals[input.name] || [];
-          vals[input.name].push(input.value);
-        }
-        break;
-      case 'radio':
-        if (input.checked) {
-          vals[input.name] = input.value;
-        }
-        break;
-      default:
-        if (input.value !== undefined) {
-          if (input.type === 'number') {
-            vals[input.name] = +input.value;
-          } else {
+        case 'checkbox':
+          if (input.checked) {
+            vals[input.name] = vals[input.name] || [];
+            vals[input.name].push(input.value);
+          }
+          break;
+        case 'radio':
+          if (input.checked) {
             vals[input.name] = input.value;
           }
-        }
-        break;
+          break;
+        default:
+          if (input.value !== undefined) {
+            if (input.type === 'number') {
+              vals[input.name] = +input.value;
+            } else {
+              vals[input.name] = input.value;
+            }
+          }
+          break;
       }
     } else if (input instanceof HTMLTextAreaElement) {
       if (input.value !== undefined) {
@@ -34,7 +38,9 @@ export function toJSON(form = this) {
       }
     } else if (input instanceof HTMLSelectElement) {
       if (input.multiple) {
-        vals[i.name] = input.selectedOptions.map(i => i.value) || [];
+        vals[i.name] = input.selectedOptions.map(function (i) {
+          return i.value;
+        }) || [];
         if (vals[i.name].length === 0) {
           delete vals[i.name];
         }
