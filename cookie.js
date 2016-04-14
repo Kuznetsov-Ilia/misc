@@ -2,14 +2,10 @@ exports.__esModule = true;
 
 var _global = require('global');
 
-var _global2 = _interopRequireDefault(_global);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 exports.default = cookie;
 
-var encode = _global2.default.encodeURIComponent;
-var decode = _global2.default.decodeURIComponent;
+var encode = _global.window.encodeURIComponent;
+var decode = _global.window.decodeURIComponent;
 
 function read(s) {
   if (s.indexOf('"') === 0) {

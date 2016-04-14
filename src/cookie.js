@@ -1,4 +1,4 @@
-import window from 'global';
+import {window} from 'global';
 export default cookie;
 
 var encode = window.encodeURIComponent;
