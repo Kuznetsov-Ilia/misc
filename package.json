@@ -1,6 +1,6 @@
 {
   "name": "misc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "misc",
   "jsnext:main": "src/*",
   "config": {
