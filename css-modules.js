@@ -13,10 +13,35 @@ var glob = _interopDefault(require('glob'));
 function pathJoin(file) {
   return path.join(process.cwd(), file);
 }
+
+
+function stringHash(str) {
+  var hash = 5381,
+      i    = str.length
+
+  while(i)
+    hash = (hash * 33) ^ str.charCodeAt(--i)
+
+  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+   * integers. Since we want the results to be always positive, convert the
+   * signed int to an unsigned by doing an unsigned bitshift. */
+  return hash >>> 0;
+}
+
 var cssfile = [];
 var cached = {};
 var trace = 0;
-var cssModules = new CssModules();
+CssModules.scope.generateScopedName = function(name, filename, css) {
+  var hash = stringHash(css).toString(36).substr(0, 5);
+  return hash;
+}
+
+var cssModules = new CssModules([
+  CssModules.values,
+  CssModules.localByDefault,
+  CssModules.extractImports,
+  CssModules.scope
+]);
 function cssModules$1 () {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -47,6 +72,8 @@ function cssModules$1 () {
       return postcss(options.plugins || []).process(source, opts).then(function (_ref) {
         var css = _ref.css;
         var map = _ref.map;
+        cssModules.scope.
+
         return cssModules.load(css, relativePath, trace, pathFetcher).then(cache).then(function (_ref2) {
           var exportTokens = _ref2.exportTokens;
           return {
