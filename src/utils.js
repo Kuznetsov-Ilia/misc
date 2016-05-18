@@ -228,3 +228,39 @@ export function strip_tags(str) {
 }
 
 
+
+export function decl(number, titles) {
+  var cases = [2, 0, 1, 1, 1, 2];
+  return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+}
+
+
+export function timestamp(timestamp) {
+  return diff(parseInt(now() / 1000) - timestamp);
+}
+export function diff(date) {
+  var time, words,
+    minute = 60,
+    hour = 3600,
+    day = 86400,
+    week = 604800,
+    month = 2628000,
+    year = 31536000;
+  if (date < minute) {
+    return '1 минуту';
+  } else if (date < (time = minute) * 60) {
+    words = ['минуту', 'минуты', 'минут'];
+  } else if (date < (time = hour) * 24) {
+    words = ['час', 'часа', 'часов'];
+  } else if (date < (time = day) * 7) {
+    words = ['день', 'дня', 'дней'];
+  } else if (date < (time = week) * 5) {
+    words = ['неделю', 'недели', 'недель'];
+  } else if (date < (time = month) * 12) {
+    words = ['месяц', 'месяца', 'месяцев'];
+  } else if (time = year) {
+    words = ['год', 'года', 'лет'];
+  }
+  var diff = parseInt(date / time);
+  return `${diff} ${decl(diff, words)}`;
+}
