@@ -21,7 +21,7 @@
     "newotvet": "npm start && npm run polyfills && cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > /Users/ikuznecov/projects/new.otvet.mail.ru/dev/polyfills.min.js",
     "ug:touch": "cat dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
     "cp:touch": "cp dist/polyfills.min.js* /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/ && cp dist/polyfills.min.js* /Users/ikuznecov/projects/touch.otvet.mail.ru/app/js/",
-    "touch": "npm start && npm run polyfills && npm run ug:touch && npm run cp:touch",
+    "touch": "npm run polyfills && npm run ug:touch && npm run cp:touch",
     "lite:ug:otvet": "cat dist/polyfills.js | uglifyjs -cm  > dist/polyfills.min.js",
     "cp:otvet:dev": "cp dist/polyfills.min.js /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapibig",
     "get:all": "npm run get:shim & npm run get:sham & npm run get:shiv",
