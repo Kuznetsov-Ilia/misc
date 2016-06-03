@@ -1,13 +1,12 @@
-var LOADED = {};
-import {document} from 'global';
-//import Promise from './Promise';
-//import fetch from './fetch';
-var head = document.getElementsByTagName('head')[0] || document.documentElement;
-
-export default function (src) {
-  //return fetch().
+var CACHED = {};
+import {isArray} from 'my-util';
+var head = document.getElementsByTagName('head')[0] || document.documentElement
+export default function loader (src) {
+  if (isArray(src)) {
+    return Promise.all(src.map(loader));
+  }
   return new Promise(function (resolve, reject) {
-    if (LOADED[src]) {
+    if (CACHED[src]) {
       resolve();
     } else {
       var script = document.createElement('script');

@@ -9,6 +9,7 @@
   "scripts": {
     "1": "npm link global",
     "2": "npm start && npm run polyfills && cat dist/shim.js dist/polyfills.js | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > dist/polyfills.min.js",
+    "loader": "rollup -i src/loader.js -o . -c",
     "start": "NODE_ENV=production babel --presets=babel-preset-normal-please src --out-dir .",
     "css": "rollup -c build/css-modules.rollup.conf.js",
     "s": "mkdir node_modules/global && cp -r ../global/dist node_modules/global/dist",
@@ -72,10 +73,13 @@
     "babel-plugin-transform-function-bind": "*",
     "babel-plugin-transform-regenerator": "*",
     "babel-preset-normal-please": "0.0.2",
+    "my-global": "^1.0.7",
+    "my-util": "^1.0.8",
+    "rollup": "*",
     "rollup-plugin-babel": "^2.4.0",
+    "rollup-plugin-node-resolve": "*",
     "spritesmith": "*",
-    "uglify-js": "*",
-    "webpack": "^2.1.0-beta.4"
+    "uglify-js": "*"
   },
   "babel": {
     "plugins": [
