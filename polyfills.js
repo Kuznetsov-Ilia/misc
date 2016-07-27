@@ -2,9 +2,6 @@ var arrayProto = Array.prototype;
 var stringProto = String.prototype;
 var arrayProps = {};
 var stringProps = {};
-/* object */
-
-Object.assign = Object.assign || extend;
 
 /* array */
 if (!arrayProto.find) {
@@ -115,18 +112,4 @@ if (!Number.parseFloat) {
 
 function has(it) {
   return this.indexOf(it) !== -1;
-}
-function extend(original, extended) {
-  if (arguments.length > 2) {
-    for (var i = 1, l = arguments.length; i < l; i++) {
-      extend(original, arguments[i]);
-    }
-  } else {
-    if (typeof extended === 'object' && extended !== null) {
-      for (var key in extended) {
-        original[key] = extended[key];
-      }
-    }
-  }
-  return original;
 }

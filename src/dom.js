@@ -1,6 +1,6 @@
  /*navigator,*/
-import {window, document, body, html as root} from 'global';
-import { isArray, isObject, isset, isNumber, isString, isNode, isFunction, keys } from './utils';
+import {window, document, body, html as root} from 'my-global';
+import { isArray, isObject, isset, isNumber, isString, isNode, isFunction, keys } from 'my-util';
 
 var Np = window.Node.prototype;
 var Ep = window.Element.prototype;

@@ -36,7 +36,7 @@
     "ug2": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js > dist/polyfills.min.js",
     "ug": "cat dist/shim.js dist/sham.js dist/shiv.js dist/ie8.js dist/polyfills.js | uglifyjs -cm | tee dist/polyfills.min.js | gzip > dist/polyfills.min.js.gz",
     "polyfills:touch": "npm run polyfills:touch:local & npm run polyfills:touch:virtualko",
-    "polyfills:touch:local": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm > ../touch.otvet.mail.ru/app/js/polyfills.min.js",
+    "polyfills:touch:local": "rollup -c | babel --presets=babel-preset-normal-please | uglifyjs -e -m sort,eval -c drop_console,dead_code,drop_debugger,unsafe,comparisons,conditionals,booleans,loops,unused,if_return,warnings > ../touch.otvet.mail.ru/app/js/polyfills.min.js",
     "polyfills:touch:virtualko": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm > /Users/ikuznecov/projects/otvet.mail.ru/virtualko/newapi/app/js/polyfills.min.js",
     "polyfills:touch:prod": "cat dist/shim.js dist/sham.js dist/shiv.js polyfills.js dom.js dom4.js | uglifyjs -cm | tee ../touch.otvet.mail.ru/app/js/polyfills.min.js | gzip > ../touch.otvet.mail.ru/app/js/polyfills.min.js.gz"
   },
