@@ -2,7 +2,7 @@
 import {window, document, body, html as root} from 'my-global';
 import { isArray, isObject, isset, isNumber, isString, isNode, isFunction, keys } from 'my-util';
 
-var Np = window.Node.prototype;
+var Np = (window.Node || window.Element).prototype;
 var Ep = window.Element.prototype;
 var NLp = window.NodeList.prototype;
 var HCp = window.HTMLCollection.prototype;
@@ -68,8 +68,14 @@ var nodeMethods = NodeMethodsKeys
 
 document.matches = (selector) => body.matches(selector);
 Object.defineProperties(NLp, listMethods);
+if (window.StaticNodeList) {
+  Object.defineProperties(window.StaticNodeList.prototype, listMethods);
+}
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
+if (!window.Node) {
+  Object.defineProperties(document, nodeMethods);
+}
 if (Wp) {
   var windowMethods = NodeMethodsKeys
     .filter(p => !(p in Wp))

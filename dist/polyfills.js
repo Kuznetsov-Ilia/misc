@@ -4,9 +4,89 @@ var arrayProto = Array.prototype;
 var stringProto = String.prototype;
 var arrayProps = {};
 var stringProps = {};
-/* object */
 
-Object.assign = Object.assign || extend;
+//https://github.com/sindresorhus/object-assign/blob/master/index.js
+/* eslint-disable no-unused-vars */
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+  if (val === null || val === undefined) {
+    throw new TypeError('Object.assign cannot be called with null or undefined');
+  }
+
+  return Object(val);
+}
+
+function shouldUseNative() {
+  try {
+    if (!Object.assign) {
+      return false;
+    }
+
+    // Detect buggy property enumeration order in older V8 versions.
+
+    // https://bugs.chromium.org/p/v8/issues/detail?id=4118
+    var test1 = new String('abc'); // eslint-disable-line no-new-wrappers
+    test1[5] = 'de';
+    if (Object.getOwnPropertyNames(test1)[0] === '5') {
+      return false;
+    }
+
+    // https://bugs.chromium.org/p/v8/issues/detail?id=3056
+    var test2 = {};
+    for (var i = 0; i < 10; i++) {
+      test2['_' + String.fromCharCode(i)] = i;
+    }
+    var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+      return test2[n];
+    });
+    if (order2.join('') !== '0123456789') {
+      return false;
+    }
+
+    // https://bugs.chromium.org/p/v8/issues/detail?id=3056
+    var test3 = {};
+    'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+      test3[letter] = letter;
+    });
+    if (Object.keys(Object.assign({}, test3)).join('') !== 'abcdefghijklmnopqrst') {
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    // We don't expect any of the above to throw, but better to be safe.
+    return false;
+  }
+}
+
+Object.assign = shouldUseNative() ? Object.assign : function (target, source) {
+  var from;
+  var to = toObject(target);
+  var symbols;
+
+  for (var s = 1; s < arguments.length; s++) {
+    from = Object(arguments[s]);
+
+    for (var key in from) {
+      if (hasOwnProperty.call(from, key)) {
+        to[key] = from[key];
+      }
+    }
+
+    if (Object.getOwnPropertySymbols) {
+      symbols = Object.getOwnPropertySymbols(from);
+      for (var i = 0; i < symbols.length; i++) {
+        if (propIsEnumerable.call(from, symbols[i])) {
+          to[symbols[i]] = from[symbols[i]];
+        }
+      }
+    }
+  }
+
+  return to;
+};
 
 /* array */
 if (!arrayProto.find) {
@@ -118,23 +198,9 @@ if (!Number.parseFloat) {
 function has(it) {
   return this.indexOf(it) !== -1;
 }
-function extend(original, extended) {
-  if (arguments.length > 2) {
-    for (var i = 1, l = arguments.length; i < l; i++) {
-      extend(original, arguments[i]);
-    }
-  } else {
-    if (typeof extended === 'object' && extended !== null) {
-      for (var key in extended) {
-        original[key] = extended[key];
-      }
-    }
-  }
-  return original;
-}
 
 var body = document.body;
-var HTML = document.documentElement;
+var html$1 = document.documentElement;
 var window$1 = self || window;
 var head = document.head || document.getElementsByTagName('head')[0];
 
@@ -172,35 +238,12 @@ function keys(o) {
   return [];
 }
 
-/*function nodeListToNode(methodName) {
-  return function () {
-    var args = arguments;
-    var returnVals = [];
-    this.each(function (node) {
-      returnVals.push(UTILS[methodName].apply(node, args));
-    });
-    return returnVals;
-  };
-}
-*/
-/*for (var i in UTILS) {
-  Np[i] = UTILS[i];
-  NLp[i] = HCp[i] = Ap[i] = nodeListToNode(i);
-}*/
-
-window$1.height = function () {
-  return HTML.clientHeight;
-};
-window$1.width = function () {
-  return HTML.clientWidth;
-};
-
-var Np = window$1.Node.prototype;
+var Np = (window$1.Node || window$1.Element).prototype;
 var Ep = window$1.Element.prototype;
 var NLp = window$1.NodeList.prototype;
 var HCp = window$1.HTMLCollection.prototype;
 var Ap = Array.prototype;
-var Wp = window$1.Window && window$1.Window.prototype || window$1.prototype;
+var Wp = window$1.Window && window$1.Window.prototype || window$1.prototype || window$1;
 var ETp = window$1.EventTarget && window$1.EventTarget.prototype;
 var CACHE = {};
 var CACHE_KEY = 0;
@@ -264,8 +307,14 @@ document.matches = function (selector) {
   return body.matches(selector);
 };
 Object.defineProperties(NLp, listMethods);
+if (window$1.StaticNodeList) {
+  Object.defineProperties(window$1.StaticNodeList.prototype, listMethods);
+}
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
+if (!window$1.Node) {
+  Object.defineProperties(document, nodeMethods);
+}
 if (Wp) {
   var windowMethods = NodeMethodsKeys.filter(function (p) {
     return !(p in Wp);
@@ -380,7 +429,6 @@ function off(event, fn) {
       });
     } else {
       // el.off(click.popup)
-
       var _event$split = event.split('.');
 
       var eventName = _event$split[0];
@@ -587,8 +635,8 @@ function offset() {
   }
   var box = el.getBoundingClientRect();
   return {
-    top: box.top + window$1.pageYOffset - HTML.clientTop,
-    left: box.left + window$1.pageXOffset - HTML.clientLeft
+    top: box.top + window$1.pageYOffset - html$1.clientTop,
+    left: box.left + window$1.pageXOffset - html$1.clientLeft
   };
 }
 function height(value) {
@@ -870,7 +918,7 @@ var splice = ArrayPrototype.splice;
 var join = ArrayPrototype.join;
 var push = ArrayPrototype.push;
 var defineProperty = Object.defineProperty;
-var NodePrototype = window$1.Node.prototype;
+var NodePrototype = (window$1.Node || window$1.Element).prototype;
 var ElementPrototype = window$1.Element.prototype;
 var SVGElement = window$1.SVGElement;
 var classListDescriptor = {
@@ -1093,3 +1141,4 @@ function toggle(token, force) {
   }
   return !!force;
 }
+

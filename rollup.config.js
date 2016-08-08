@@ -1,6 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 export default {
-  entry: 'polyfills+dom+dom4.js',
+  entry: './polyfills+dom+dom4.js',
   //dest: 'app/build/test.js',
   format: 'cjs',
   plugins: [
