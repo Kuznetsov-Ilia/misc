@@ -7,7 +7,8 @@ var Ep = window.Element.prototype;
 var NLp = window.NodeList.prototype;
 var HCp = window.HTMLCollection.prototype;
 var Ap = Array.prototype;
-var Wp = (window.Window && window.Window.prototype) || window.prototype || window;
+var Wp = window;
+var Dp = document;
 var ETp = (window.EventTarget && window.EventTarget.prototype);
 var CACHE = {};
 var CACHE_KEY = 0;
@@ -65,29 +66,28 @@ var reduceNodeMethods = (acc, key) => (acc[key] = {value: NodeMethods[key]}, acc
 var nodeMethods = NodeMethodsKeys
   .filter(p => !(p in Np))
   .reduce(reduceNodeMethods, {});
+var windowMethods = NodeMethodsKeys
+  .filter(p => !(p in Wp))
+  .reduce(reduceNodeMethods, {});
 
 document.matches = (selector) => body.matches(selector);
+
 Object.defineProperties(NLp, listMethods);
-if (window.StaticNodeList) {
+if (window.StaticNodeList && window.StaticNodeList.prototype) {
   Object.defineProperties(window.StaticNodeList.prototype, listMethods);
 }
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
-if (!window.Node) {
-  Object.defineProperties(document, nodeMethods);
-}
-if (Wp) {
-  var windowMethods = NodeMethodsKeys
-    .filter(p => !(p in Wp))
-    .reduce(reduceNodeMethods, {});
-  Object.defineProperties(Wp, windowMethods);
-}
+Object.defineProperties(Dp, nodeMethods);
+Object.defineProperties(Wp, windowMethods);
+
 if (ETp) {
   var ETMethods = NodeMethodsKeys
     .filter(p => !(p in ETp))
     .reduce(reduceNodeMethods, {});
   Object.defineProperties(ETp, ETMethods);
 }
+
 var ua = window.navigator.userAgent;
 if (ua.indexOf('MSIE ') !== -1 || ua.indexOf('Trident/') !== -1 || ua.indexOf('Edge/') !== -1) {
   // rewrite broken cloneNode method in IE

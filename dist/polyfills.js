@@ -243,7 +243,8 @@ var Ep = window$1.Element.prototype;
 var NLp = window$1.NodeList.prototype;
 var HCp = window$1.HTMLCollection.prototype;
 var Ap = Array.prototype;
-var Wp = window$1.Window && window$1.Window.prototype || window$1.prototype || window$1;
+var Wp = window$1;
+var Dp = document;
 var ETp = window$1.EventTarget && window$1.EventTarget.prototype;
 var CACHE = {};
 var CACHE_KEY = 0;
@@ -302,31 +303,30 @@ var reduceNodeMethods = function reduceNodeMethods(acc, key) {
 var nodeMethods = NodeMethodsKeys.filter(function (p) {
   return !(p in Np);
 }).reduce(reduceNodeMethods, {});
+var windowMethods = NodeMethodsKeys.filter(function (p) {
+  return !(p in Wp);
+}).reduce(reduceNodeMethods, {});
 
 document.matches = function (selector) {
   return body.matches(selector);
 };
+
 Object.defineProperties(NLp, listMethods);
-if (window$1.StaticNodeList) {
+if (window$1.StaticNodeList && window$1.StaticNodeList.prototype) {
   Object.defineProperties(window$1.StaticNodeList.prototype, listMethods);
 }
 Object.defineProperties(HCp, listMethods);
 Object.defineProperties(Np, nodeMethods);
-if (!window$1.Node) {
-  Object.defineProperties(document, nodeMethods);
-}
-if (Wp) {
-  var windowMethods = NodeMethodsKeys.filter(function (p) {
-    return !(p in Wp);
-  }).reduce(reduceNodeMethods, {});
-  Object.defineProperties(Wp, windowMethods);
-}
+Object.defineProperties(Dp, nodeMethods);
+Object.defineProperties(Wp, windowMethods);
+
 if (ETp) {
   var ETMethods = NodeMethodsKeys.filter(function (p) {
     return !(p in ETp);
   }).reduce(reduceNodeMethods, {});
   Object.defineProperties(ETp, ETMethods);
 }
+
 var ua = window$1.navigator.userAgent;
 if (ua.indexOf('MSIE ') !== -1 || ua.indexOf('Trident/') !== -1 || ua.indexOf('Edge/') !== -1) {
   // rewrite broken cloneNode method in IE
